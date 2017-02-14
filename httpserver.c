@@ -25,13 +25,13 @@ int start_server(int PORT_NUMBER)
 
       // 1. socket: creates a socket descriptor that you later use to make other system calls
       if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-	perror("Socket");
-	exit(1);
+          perror("Socket");
+          exit(1);
       }
       int temp;
       if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&temp,sizeof(int)) == -1) {
-	perror("Setsockopt");
-	exit(1);
+          perror("Setsockopt");
+          exit(1);
       }
 
       // configure the server
@@ -77,11 +77,15 @@ int start_server(int PORT_NUMBER)
             printf("This is the incoming request:\n%s\n", request);
             
             // this is the message that we'll send back
-            char *reply = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html>Hello world!<p>This text is <b>bold</b>.</html>";
+            char *reply = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html>Hello world!";
+            
+            char *reply2 = "<p>This text is <b>bold right now</b>.</html>";
             
             // 6. send: send the outgoing message (response) over the socket
             // note that the second argument is a char*, and the third is the number of chars
             send(fd, reply, strlen(reply), 0);
+            sleep(5);
+            send(fd, reply2, strlen(reply2), 0);
         }
         // 7. close: close the connection
         close(fd);
