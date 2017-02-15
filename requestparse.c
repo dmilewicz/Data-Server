@@ -33,10 +33,26 @@ parsed_request* parse_request(char* request_str) {
     request_str[idx] = '\0';
     incoming_request->rest = request_str + idx + 1;
     
+    incoming_request->postdata = NULL;
+    
     return incoming_request;
     
         
 }
+
+char* get_variables(char* rest) {
+    
+    int i = 0;
+    while (rest[i] != '\n') i++;
+    
+    rest[i] = '\0';
+    rest[i+1] = '\0';
+    
+    return rest + i + 2;
+    
+}
+
+
 
 
 

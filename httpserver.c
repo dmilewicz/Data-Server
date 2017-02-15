@@ -15,6 +15,7 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include <errno.h>
 #include <string.h>
 #include "requestparse.h"
+#include "readHTML.h"
 
 int start_server(int PORT_NUMBER)
 {
@@ -65,7 +66,7 @@ int start_server(int PORT_NUMBER)
         if (fd != -1) {
             printf("Server got a connection from (%s, %d)\n", inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
             printf("fd: %d\n", fd);
-            printf("sock: %d", sock);
+            printf("sock: %d\n\n", sock);
             
             // buffer to read data into
             char request[1024];
@@ -75,26 +76,34 @@ int start_server(int PORT_NUMBER)
             // null-terminate the string
             request[bytes_received] = '\0';
             // print it to standard out
-            printf("This is the incoming request:\n%s\n", request);
+//            printf("This is the incoming request:\n%s\n\n", request);
             
             parsed_request* pr = parse_request(request);
             
             print_request(*pr);
+            if (strcmp(pr->request_type, "POST") == 0) {
+                pr->postdata = get_variables(pr->rest);
+                printf("Parameters: %s\n", pr->postdata);
+            }
+                
             
             // this is the message that we'll send back
-//            char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
+            char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
             
+            //read in HTML file
+            char* resource = readHTML("index.html");
             
-            
-            char *reply = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html>Hello world!";
-            
-            char *reply2 = "<p>This text is <b>bold right now</b>.</html>";
+//            print file for testing
+//            printf("%s", resource);
             
             // 6. send: send the outgoing message (response) over the socket
-            // note that the second argument is a char*, and the third is the number of chars
-            send(fd, reply, strlen(reply), 0);
-//            sleep(5);
-//            send(fd, reply2, strlen(reply2), 0);
+            send(fd, header, strlen(header), 0);
+            send(fd, resource, strlen(resource), 0);
+            
+            
+            
+            
+            
         }
         // 7. close: close the connection
         close(fd);

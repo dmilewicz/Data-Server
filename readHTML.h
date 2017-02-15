@@ -10,5 +10,6 @@
 #define readHTML_h
 
 #include <stdio.h>
-
+#include <stdlib.h>
+char* readHTML(char* resource);
 #endif /* readHTML_h */

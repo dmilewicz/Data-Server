@@ -14,7 +14,15 @@ char* readHTML(char* resource) {
     FILE* fp= fopen(resource, "r");
     if (fp == NULL) return NULL;
     
-    char
     
+    fseek(fp, 0, SEEK_END);
+    long file_len = ftell(fp);
+    rewind(fp);
     
+    char* file_contents = malloc((file_len + 1) * sizeof(char));
+    fread(file_contents, file_len, 1, fp);
+    fclose(fp);
+    
+    return file_contents;
+
 }

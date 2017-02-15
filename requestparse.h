@@ -21,8 +21,9 @@ typedef struct internetrequest {
     char* HTTP_version;
     char* host;
     char* rest;
+    char* postdata;
 } parsed_request;
 
 parsed_request* parse_request(char* request_str);
 void print_request(parsed_request pr);
-
+char* get_variables(char* rest);
