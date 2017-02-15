@@ -10,12 +10,25 @@
 
 <form method="POST" id="contentForm">
     <input type="text" name="search" value="Mickey">
-    <select name="search field">
+    <select name="searchfield">
+        <option selected disabled>Choose sort value</option>
+        <option value="coursenumber">Course Number</option>
+        <option value="instructorname">Instructor Name</option>
+        <option value="enrollment">Enrollment</option>
+        <option value="coursequality">Course Quality</option>
+        <option value="coursedifficulty">Course Difficulty: High to Low</option>
+        <option value="coursedifficulty">Course Difficulty: Low to High</option>
+        
+    </select>
+    
 
-    <input type="radio" name="async" value="false">
+    Async: <input type="checkbox" name="async" value="false">
+    
+    <select value="sortfield">
+        
+    <input type="submit" value="Submit">
     
     </select>
-
 
 </form>
 

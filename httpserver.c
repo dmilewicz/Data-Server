@@ -14,6 +14,7 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include "requestparse.h"
 
 int start_server(int PORT_NUMBER)
 {
@@ -76,7 +77,15 @@ int start_server(int PORT_NUMBER)
             // print it to standard out
             printf("This is the incoming request:\n%s\n", request);
             
+            parsed_request* pr = parse_request(request);
+            
+            print_request(*pr);
+            
             // this is the message that we'll send back
+//            char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
+            
+            
+            
             char *reply = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html>Hello world!";
             
             char *reply2 = "<p>This text is <b>bold right now</b>.</html>";
@@ -84,8 +93,8 @@ int start_server(int PORT_NUMBER)
             // 6. send: send the outgoing message (response) over the socket
             // note that the second argument is a char*, and the third is the number of chars
             send(fd, reply, strlen(reply), 0);
-            sleep(5);
-            send(fd, reply2, strlen(reply2), 0);
+//            sleep(5);
+//            send(fd, reply2, strlen(reply2), 0);
         }
         // 7. close: close the connection
         close(fd);
@@ -117,4 +126,6 @@ int main(int argc, char *argv[])
 
   start_server(port_number);
 }
+
+                   
 
