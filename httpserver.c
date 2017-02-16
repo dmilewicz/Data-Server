@@ -83,7 +83,7 @@ int start_server(int PORT_NUMBER)
             print_request(*pr);
             if (strcmp(pr->request_type, "POST") == 0) {
                 pr->postdata = get_variables(pr->rest);
-                printf("Parameters: %s\n", pr->postdata);
+                printf("POST data: %s\n", pr->postdata);
             }
                 
             
