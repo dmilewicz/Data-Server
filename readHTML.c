@@ -11,7 +11,7 @@
 
 
 char* readHTML(char* resource) {
-    FILE* fp= fopen(resource, "r");
+    FILE* fp= fopen(resource, "rb");
     if (fp == NULL) return NULL;
     
     
