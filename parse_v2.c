@@ -16,12 +16,16 @@ void print_courses(course_data* courses, int size){
 }
 
 int main(){
+
+// Initialize files 
 char* file_name = "course_evals.txt"; 
 FILE* courses_file = fopen(file_name, "rb");
+FILE* data_file = fopen("data.html","wb"); 
+
+// initialize number of lines/ character info 
 int num_lines = 0; 
 int character; 
 char course_info[150];
-char info[100];
 
 // get total number of lines in file 
 do 
@@ -38,14 +42,25 @@ courses_file = fopen(file_name, "rb");
 course_data courses[num_lines]; 
 int index = 0;
 char* temp; 
-char* check; 
 int length = 0; 
 int count = 0; 
-int count_data = 0;
+
+// write header to data.html file 
+char* header = "<html>\n<head>\n</head>\n<body>\n<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n"; 
+fputs(header, data_file);
+
+// initialize open and close row/data tags
+char* open_row_tag = "<tr>\n"; 
+char* closed_row_tag = "</tr>\n"; 
+char* open_data_tag = "<td>"; 
+char* closed_data_tag = "</td>\n"; 
 
 // Read in words from text and store into hashtable 
 while(fgets(course_info,150,courses_file)){
-	// set the newline to null 
+		// start new row of data 
+		fputs(open_row_tag, data_file);
+
+		// set the newline to null 
 		length = strlen(course_info);
 		course_info[length-1] = '\0';
 		
@@ -63,6 +78,13 @@ while(fgets(course_info,150,courses_file)){
 			if(count == 0){
 				temp = strtok(course_info, ",");  
 				strcpy(courses[index].course_id, temp); 
+				// temp = strcat(open_data_tag, courses[index].course_id); 
+				// temp = strcat(temp, closed_data_tag); 
+				// fputs(temp, data_file);
+				fputs(open_data_tag, data_file);
+				fputs(courses[index].course_id, data_file);
+				fputs(closed_data_tag, data_file);
+
 			}
 
 			if(count == 1){
@@ -70,6 +92,9 @@ while(fgets(course_info,150,courses_file)){
 				temp++; 
 				strcpy(courses[index].prof, temp); 
 				// printf("%s\n", courses[index].prof);
+				fputs(open_data_tag, data_file);
+				fputs(courses[index].prof, data_file);
+				fputs(closed_data_tag, data_file);
 			}
 
 			if(count == 2){
@@ -77,6 +102,9 @@ while(fgets(course_info,150,courses_file)){
 				temp++; 
 				courses[index].enrollment = strtol(temp, NULL, 10); 
 				// printf("%d\n", courses[index].enrollment);	
+				fputs(open_data_tag, data_file);
+				fputs(temp, data_file);
+				fputs(closed_data_tag, data_file);
 			}
 
 			if(count == 3){
@@ -84,13 +112,19 @@ while(fgets(course_info,150,courses_file)){
 				temp++; 
 				courses[index].quality = strtod(temp, NULL); 
 				// printf("%f\n", courses[index].quality);	
+				fputs(open_data_tag, data_file);
+				fputs(temp, data_file);
+				fputs(closed_data_tag, data_file);
 			}
 
 			if(count == 4){
 				temp = strtok(NULL, ","); 
 				temp++; 
 				courses[index].difficulty = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].difficulty);	
+				// printf("%f\n", courses[index].difficulty);
+				fputs(open_data_tag, data_file);
+				fputs(temp, data_file);
+				fputs(closed_data_tag, data_file);	
 			}
 
 			if(count == 5){
@@ -98,6 +132,9 @@ while(fgets(course_info,150,courses_file)){
 				temp++; 
 				courses[index].instructor_quality = strtod(temp, NULL); 
 				// printf("%f\n", courses[index].instructor_quality);	
+				fputs(open_data_tag, data_file);
+				fputs(temp, data_file);
+				fputs(closed_data_tag, data_file);
 			}
 			count++; 
 		}
@@ -105,12 +142,20 @@ while(fgets(course_info,150,courses_file)){
 		memset(course_info, '\0',150);
 		index++;
 		count = 0; 
+
+		// end row of data 
+		fputs(closed_row_tag,data_file);
 }
 	// printf("\n");
 	print_courses(courses,num_lines);
 
-// close file 
+// add footer to data.html file 
+char* footer = "</table>\n</body>\n</html>";
+fputs(footer, data_file);
+
+// close files 
 fclose(courses_file);
+fclose(data_file);
 return 0; 
 	
 }
