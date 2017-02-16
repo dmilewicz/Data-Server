@@ -92,6 +92,7 @@ int start_server(int PORT_NUMBER)
             
             //read in HTML file
             char* resource = readHTML("index.html");
+            char* data = readHTML("data.html");
             
 //            print file for testing
 //            printf("%s", resource);
@@ -99,11 +100,7 @@ int start_server(int PORT_NUMBER)
             // 6. send: send the outgoing message (response) over the socket
             send(fd, header, strlen(header), 0);
             send(fd, resource, strlen(resource), 0);
-            
-            
-            
-            
-            
+            send(fd, data, strlen(data), 0);  
         }
         // 7. close: close the connection
         close(fd);
