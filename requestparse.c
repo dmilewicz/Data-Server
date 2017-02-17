@@ -52,7 +52,6 @@ char* get_variables(char* rest) {
     
 }
 
-char[4][2] 
 
 
 
