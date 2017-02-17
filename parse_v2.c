@@ -1,6 +1,18 @@
+/* 
+ * Created by Obinna Asinugo on 2/14/17.
+ * Copyright © 2017 Obinna Asinugo. All rights reserved.
+ * 
+ * parse_v2.c 
+ * 
+ * PURPOSE: 
+ * This program was constructed to help parse course evaluation data 
+ * (from the University of Pennsylvania) into html format.
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "readHTML.h"
 #include "parse.h"
 
 void print_courses(course_data* courses, int size){
@@ -15,48 +27,49 @@ void print_courses(course_data* courses, int size){
 	}
 }
 
-int main(){
+int total_lines(char* file_name){ 
+	// open file and initialize variables 
+	FILE* courses_file = fopen(file_name, "rb");
+	int num_lines = 0; 
+	int character; 
 
-// Initialize files 
-char* file_name = "course_evals.txt"; 
-FILE* courses_file = fopen(file_name, "rb");
-FILE* data_file = fopen("data.html","wb"); 
+	// get total number of lines in file 
+	do 
+	{
+	    character = fgetc(courses_file);
+	    if(character == '\n')
+	        num_lines++;
+	} while (character != EOF);
 
-// initialize number of lines/ character info 
-int num_lines = 0; 
-int character; 
-char course_info[150];
+	// close file and return total number of lines 
+	fclose(courses_file);
+	return num_lines; 
+}
 
-// get total number of lines in file 
-do 
-{
-    character = fgetc(courses_file);
-    if(character == '\n')
-        num_lines++;
-} while (character != EOF);
+char* parse(char* file_name, course_data* courses){
+	// Initialize files 
+	FILE* data_file = fopen(file_name,"wb"); 
+	FILE* courses_file = fopen("course_evals.txt", "rb");
+	
+	// initialize string tracking info 
+	char course_info[150];
+	int index = 0;
+	char* temp; 
+	int length = 0; 
+	int count = 0; 
 
-// close and reopen file 
-fclose(courses_file);
-courses_file = fopen(file_name, "rb");
+	// write header to data.html file 
+	char* header = "<html>\n<head>\n</head>\n<body>\n<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n"; 
+	fputs(header, data_file);
 
-course_data courses[num_lines]; 
-int index = 0;
-char* temp; 
-int length = 0; 
-int count = 0; 
+	// initialize open and close row/data tags
+	char* open_row_tag = "<tr>\n"; 
+	char* closed_row_tag = "</tr>\n"; 
+	char* open_data_tag = "<td>"; 
+	char* closed_data_tag = "</td>\n"; 
 
-// write header to data.html file 
-char* header = "<html>\n<head>\n</head>\n<body>\n<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n"; 
-fputs(header, data_file);
-
-// initialize open and close row/data tags
-char* open_row_tag = "<tr>\n"; 
-char* closed_row_tag = "</tr>\n"; 
-char* open_data_tag = "<td>"; 
-char* closed_data_tag = "</td>\n"; 
-
-// Read in words from text and store into hashtable 
-while(fgets(course_info,150,courses_file)){
+	// Read in words from text and store into hashtable 
+	while(fgets(course_info,150,courses_file)){
 		// start new row of data 
 		fputs(open_row_tag, data_file);
 
@@ -67,7 +80,7 @@ while(fgets(course_info,150,courses_file)){
 		// initialize space for course info space 
 		courses[index].course_info = malloc(sizeof(char)*length+1); 
 		if(courses[index].course_info == NULL)
-			return -1; 
+			return NULL; 
 		courses[index].course_info[length] = '\0';
 
 		// copy string contents from line to data structure 
@@ -78,9 +91,6 @@ while(fgets(course_info,150,courses_file)){
 			if(count == 0){
 				temp = strtok(course_info, ",");  
 				strcpy(courses[index].course_id, temp); 
-				// temp = strcat(open_data_tag, courses[index].course_id); 
-				// temp = strcat(temp, closed_data_tag); 
-				// fputs(temp, data_file);
 				fputs(open_data_tag, data_file);
 				fputs(courses[index].course_id, data_file);
 				fputs(closed_data_tag, data_file);
@@ -91,7 +101,6 @@ while(fgets(course_info,150,courses_file)){
 				temp = strtok(NULL, ","); 
 				temp++; 
 				strcpy(courses[index].prof, temp); 
-				// printf("%s\n", courses[index].prof);
 				fputs(open_data_tag, data_file);
 				fputs(courses[index].prof, data_file);
 				fputs(closed_data_tag, data_file);
@@ -100,8 +109,7 @@ while(fgets(course_info,150,courses_file)){
 			if(count == 2){
 				temp = strtok(NULL, ","); 
 				temp++; 
-				courses[index].enrollment = strtol(temp, NULL, 10); 
-				// printf("%d\n", courses[index].enrollment);	
+				courses[index].enrollment = strtol(temp, NULL, 10); 	
 				fputs(open_data_tag, data_file);
 				fputs(temp, data_file);
 				fputs(closed_data_tag, data_file);
@@ -110,8 +118,7 @@ while(fgets(course_info,150,courses_file)){
 			if(count == 3){
 				temp = strtok(NULL, ","); 
 				temp++; 
-				courses[index].quality = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].quality);	
+				courses[index].quality = strtod(temp, NULL); 	
 				fputs(open_data_tag, data_file);
 				fputs(temp, data_file);
 				fputs(closed_data_tag, data_file);
@@ -121,7 +128,6 @@ while(fgets(course_info,150,courses_file)){
 				temp = strtok(NULL, ","); 
 				temp++; 
 				courses[index].difficulty = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].difficulty);
 				fputs(open_data_tag, data_file);
 				fputs(temp, data_file);
 				fputs(closed_data_tag, data_file);	
@@ -131,32 +137,26 @@ while(fgets(course_info,150,courses_file)){
 				temp = strtok(NULL, "\n"); 
 				temp++; 
 				courses[index].instructor_quality = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].instructor_quality);	
 				fputs(open_data_tag, data_file);
 				fputs(temp, data_file);
 				fputs(closed_data_tag, data_file);
 			}
 			count++; 
 		}
-		// printf("%s\n", courses[index].course_info);
 		memset(course_info, '\0',150);
 		index++;
 		count = 0; 
 
 		// end row of data 
 		fputs(closed_row_tag,data_file);
-}
-	// printf("\n");
-	print_courses(courses,num_lines);
+	}	
 
-// add footer to data.html file 
-char* footer = "</table>\n</body>\n</html>";
-fputs(footer, data_file);
+	// add footer to data.html file 
+	char* footer = "</table>\n</body>\n</html>";
+	fputs(footer, data_file);
 
-// close files 
-fclose(courses_file);
-fclose(data_file);
-return 0; 
-	
+	// close files 
+	fclose(courses_file);
+	fclose(data_file);
+	return readHTML("data.html"); 
 }
-	
