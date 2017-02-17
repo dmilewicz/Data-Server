@@ -1,8 +1,16 @@
-/*
- * Header file for parsing data. 
+/* 
+ * Created by Obinna Asinugo on 2/14/17.
+ * Copyright © 2017 Obinna Asinugo. All rights reserved.
+ * 
+ * parse_v2.h
+ * 
+ * Purpose: 
+ * Header file for parse_v2.c. 
+ * 
  */
 #ifndef parse_h
 #define parse_h
+
 // declare functions/ structure(s)
 typedef struct CourseData{
 	char* course_info; 
