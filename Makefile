@@ -1,13 +1,10 @@
 CC = clang
 ARGS = -Wall
 
-all: clean server parse_v2 
+all: clean server 
 
 server:
-	$(CC) -o server $(ARGS) httpserver.c requestparse.c readHTML.c
-
-parse_v2:
-	$(CC) -o parse_v2 $(ARGS) parse_v2.c
+	$(CC) -o server $(ARGS) httpserver.c requestparse.c parse_v2.c readHTML.c 
 
 clean:
 	rm -rf server parse_v2 *.o
