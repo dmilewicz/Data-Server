@@ -16,6 +16,7 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include <string.h>
 #include "requestparse.h"
 #include "readHTML.h"
+#include "parse.h"
 
 int start_server(int PORT_NUMBER)
 {
@@ -92,7 +93,10 @@ int start_server(int PORT_NUMBER)
             
             //read in HTML file
             char* resource = readHTML("index.html");
-            char* data = readHTML("data.html");
+
+            // parse data into structure and format data into html 
+            course_data courses[total_lines("course_evals.txt")]; 
+			char* data = parse("data.html",courses);
             
 //            print file for testing
 //            printf("%s", resource);
