@@ -6,30 +6,37 @@
 <body>
 
 <h1>UPenn Teacher evaluations</h1>
-<p>This is a paragraph.</p>
 
 <form method="POST" id="contentForm">
-    <input type="text" name="search" value="Mickey">
+    <input type="text" name="search">
+    
     <select name="searchfield">
+        <option selected disabled>Choose search value</option>
+        <option value="coursenumber">Course Number</option>
+        <option value="instructorname">Instructor Name</option>
+        <option value="enrollment">Enrollment</option>
+        <option value="coursequalityhigh">Course Quality: Above value</option>
+        <option value="coursequalitylow">Course Quality: Below value</option>
+        <option value="coursedifficultyhigh">Course Difficulty: Above value</option>
+        <option value="coursedifficultylow">Course Difficulty: Below value</option>
+    </select>
+
+    Async: <input type="checkbox" name="async" value="false">
+    
+    
+    <input type="submit" value="Submit">
+    
+
+    <select name="sortfield">
         <option selected disabled>Choose sort value</option>
         <option value="coursenumber">Course Number</option>
         <option value="instructorname">Instructor Name</option>
         <option value="enrollment">Enrollment</option>
-        <option value="coursequality">Course Quality</option>
-        <option value="coursedifficulty">Course Difficulty: High to Low</option>
-        <option value="coursedifficulty">Course Difficulty: Low to High</option>
-        
+        <option value="coursequalityhigh">Course Quality: High to Low</option>
+        <option value="coursequalitylow">Course Quality: Low to High</option>
+        <option value="coursedifficultyhigh">Course Difficulty: High to Low</option>
+        <option value="coursedifficultylow">Course Difficulty: Low to High</option>
     </select>
-    
-
-    Async: <input type="checkbox" name="async" value="false">
-    
-    <select value="sortfield">
-        
-    <input type="submit" value="Submit">
-    
-    </select>
-
 </form>
 
 
