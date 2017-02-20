@@ -54,7 +54,15 @@ int start_server(int PORT_NUMBER)
     data_container* data = parse_data("course_evals.txt");
     
     
-    quicksort_data(data->data, 0, data->length, compare_enrollment);
+    
+    printf("sorting data...");
+    
+    quicksort_data(data->data, 0, data->length - 1, compare_professors);
+//    printf("%d\n", partition_data(data->data, 0, data->length-1, compare_enrollment));
+    
+    
+//    swap(data->data, 0, 1);
+    
     
     data_to_HTML(data);
     
@@ -111,8 +119,7 @@ int start_server(int PORT_NUMBER)
             char* resource = readHTML("index.html");
 
             // parse data into structure and format data into html 
-            course_data courses[total_lines("course_evals.txt")]; 
-			      char* data = parse("data.html",courses);
+            char* data = readHTML("data.html");
             
 //            print file for testing
 //            printf("%s", resource);

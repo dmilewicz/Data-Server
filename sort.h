@@ -10,6 +10,7 @@
 #define sort_h
 
 #include <stdio.h>
+#include <strings.h>
 
 #endif /* sort_h */
 
@@ -18,7 +19,8 @@
 
 
 
-void swap(void** arr, int a, int b);
+void swap(course_data** arr, int a, int b);
 int partition_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) );
 int compare_enrollment(course_data* a, course_data* b);
 void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) );
+int compare_professors(course_data* a, course_data* b);

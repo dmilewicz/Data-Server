@@ -32,10 +32,15 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     
     int i = p+1, j = r;
     
-    while( i <= j) {
-        
-        while(compare(data[i], pivot) < 0) i++;
-        while(compare(data[i], pivot) > 0) j--;
+    while( i < j) {
+        printf("%d\n", p);
+        printf("i: %d, j: %d\n", i,j);
+        printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
+        while(i <= j && compare(data[i], pivot) <= 0) {
+            i++;
+            printf("i: %d\n", i);
+        }
+        while(i <= j && compare(data[j], pivot) > 0) j--;
         
         if (i <= j) swap(data, i, j);
     }
@@ -45,16 +50,22 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     
 }
 
-
+int compare_professors(course_data* a, course_data* b) {
+    return strcmp(a->prof, b->prof);
+}
 
 int compare_enrollment(course_data* a, course_data* b) {
     return a->enrollment - b->enrollment;
 }
 
+int compare_course_name(course_data* a, course_data* b) {
+    return strcmp(a->course_id, b->course_id);
+}
 
 
-void swap(void** arr, int a, int b) {
-    void* temp = arr[a];
+
+void swap(course_data** arr, int a, int b) {
+    course_data* temp = arr[a];
     arr[a] = arr[b];
     arr[b] = temp;
 }
