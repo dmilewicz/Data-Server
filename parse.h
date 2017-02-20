@@ -20,13 +20,21 @@ typedef struct CourseData{
 	double quality; 
 	double difficulty; 
 	double instructor_quality; 
-} course_data; 
-
-char* parse	(char* str, course_data* data) ;
-void print_courses	(course_data* courses, int size) ;
-int total_lines(char* file_name) ; 
-
-#endif  
+} course_data;
 
 
 
+typedef struct data {
+    course_data** data;
+    size_t length;
+} data_container;
+
+
+
+
+int parse (char* str, course_data* data) ;
+void data_to_HTML(data_container* data);
+data_container* parse_data(char* filename);
+void free_data_container(data_container* d);
+
+#endif

@@ -17,36 +17,51 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include "requestparse.h"
 #include "readHTML.h"
 #include "parse.h"
+#include "sort.h"
 
 int start_server(int PORT_NUMBER)
 {
-      // structs to represent the server and client
-      struct sockaddr_in server_addr,client_addr;    
-      
-      int sock; // socket descriptor
 
-      // 1. socket: creates a socket descriptor that you later use to make other system calls
-      if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-          perror("Socket");
-          exit(1);
-      }
-      int temp;
-      if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&temp,sizeof(int)) == -1) {
-          perror("Setsockopt");
-          exit(1);
-      }
+    // structs to represent the server and client
+    struct sockaddr_in server_addr,client_addr;
+    
+    int sock; // socket descriptor
 
-      // configure the server
-      server_addr.sin_port = htons(PORT_NUMBER); // specify port number
-      server_addr.sin_family = AF_INET;         
-      server_addr.sin_addr.s_addr = INADDR_ANY; 
-      bzero(&(server_addr.sin_zero),8); 
+    // 1. socket: creates a socket descriptor that you later use to make other system calls
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        perror("Socket");
+        exit(1);
+    }
+    int temp;
+    if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&temp,sizeof(int)) == -1) {
+        perror("Setsockopt");
+        exit(1);
+    }
+
+    // configure the server
+    server_addr.sin_port = htons(PORT_NUMBER); // specify port number
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    bzero(&(server_addr.sin_zero),8);
       
       // 2. bind: use the socket and associate it with the port number
-      if (bind(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) {
-          perror("Unable to bind");
-          exit(1);
-      }
+    if (bind(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) {
+        perror("Unable to bind");
+        exit(1);
+    }
+    
+    unlink("data.html");
+    data_container* data = parse_data("course_evals.txt");
+    
+    
+    quicksort_data(data->data, 0, data->length, compare_enrollment);
+    
+    data_to_HTML(data);
+    
+    
+    
+    
+    
     while(1) {
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
@@ -90,6 +105,8 @@ int start_server(int PORT_NUMBER)
             // this is the message that we'll send back
             char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
             
+            
+            
             //read in HTML file
             char* resource = readHTML("index.html");
 
@@ -108,13 +125,16 @@ int start_server(int PORT_NUMBER)
         // 7. close: close the connection
         close(fd);
         printf("Server closed connection\n");
-      }
+    }
     
-      // 8. close: close the socket
-      close(sock);
-      printf("Server shutting down\n");
+    free_data_container(data);
+    
+    
+    // 8. close: close the socket
+    close(sock);
+    printf("Server shutting down\n");
   
-      return 0;
+    return 0;
 } 
 
 
