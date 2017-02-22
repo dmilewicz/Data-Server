@@ -53,7 +53,9 @@ char* get_variables(char* rest) {
 }
 
 
-
+int isPost(parsed_request* p) {
+    return strcmp(p->request_type, "POST") == 0;
+}
 
 
 

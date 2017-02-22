@@ -50,6 +50,10 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     
 }
 
+int compare_course_id(course_data* a, course_data* b) {
+    return strcmp(a->course_id, b->course_id);
+}
+
 int compare_professors(course_data* a, course_data* b) {
     return strcmp(a->prof, b->prof);
 }
@@ -58,9 +62,22 @@ int compare_enrollment(course_data* a, course_data* b) {
     return a->enrollment - b->enrollment;
 }
 
-int compare_course_name(course_data* a, course_data* b) {
-    return strcmp(a->course_id, b->course_id);
+int compare_quality(course_data* a, course_data* b) {
+    return a->instructor_quality - b->instructor_quality;
 }
+
+int compare_dificulty(course_data* a, course_data* b) {
+    return a->difficulty - b->difficulty;
+}
+
+int compare_instructor_quality(course_data* a, course_data* b) {
+    return a->instructor_quality - b->instructor_quality;
+}
+
+
+
+
+
 
 
 

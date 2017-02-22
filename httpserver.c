@@ -104,16 +104,20 @@ int start_server(int PORT_NUMBER)
             parsed_request* pr = parse_request(request);
             
             print_request(*pr);
-            if (strcmp(pr->request_type, "POST") == 0) {
+            if (  isPost(pr)  ) {
                 pr->postdata = get_variables(pr->rest);
                 printf("POST data: %s\n", pr->postdata);
+                
+                
+                
+                
+                
+                
             }
                 
             
             // this is the message that we'll send back
             char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
-            
-            
             
             //read in HTML file
             char* resource = readHTML("index.html");
@@ -143,6 +147,8 @@ int start_server(int PORT_NUMBER)
   
     return 0;
 } 
+
+
 
 
 

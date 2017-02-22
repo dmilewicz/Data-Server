@@ -32,7 +32,7 @@ typedef struct data {
 
 
 
-int parse (char* str, course_data* data) ;
+int parse (char* str, course_data* data);
 void data_to_HTML(data_container* data);
 data_container* parse_data(char* filename);
 void free_data_container(data_container* d);
