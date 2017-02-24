@@ -1,3 +1,4 @@
+
 //
 //  requestparse.c
 //  595_project1
@@ -7,6 +8,8 @@
 //
 
 #include "requestparse.h"
+#include "parse.h"
+#include "arraylist.h"
 
 
 
@@ -57,8 +60,120 @@ int isPost(parsed_request* p) {
     return strcmp(p->request_type, "POST") == 0;
 }
 
+char* get_post(char* pr){
+    char* search = "search";
+    char* post = strstr(pr, search);
+    return post; 
+}
 
 
+post_request* parse_post(post_request* pr, char* string){
+    char* post_string = get_post(string); 
+    // printf("%s\n",post_string);
+    char* delim = "=";
+    char* tokens[10]; 
+    int index = 0; 
+    char* temp = strtok(post_string, delim);
+
+    while(temp != NULL){
+        temp = strtok(NULL, delim);
+        tokens[index] = temp; 
+        printf("%s\n", tokens[index]); 
+        index++; 
+    }
+
+    // store search filter string and field type 
+    if(tokens[0]!=NULL){
+        char* check = strstr(tokens[0], "&"); 
+        // printf("%s\n", check);
+        if(check != NULL){
+            pr->search = strtok(tokens[0],"&"); 
+            pr->field_type = strtok(NULL, "&"); 
+            pr->field = tokens[1];
+        }
+        else{
+            pr->search = tokens[0];
+        }
+    }
+    return pr;
+}
+
+data_container* filter_course_number(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // store course indices of matched strings 
+    for(int i = 0; i < data->length; i++){
+        char* check = strstr(courses[i]->course_id, pr->search); 
+        if(check != NULL){
+            al_add(course_indices, i); 
+        }
+    }
+
+    // create array of courses based on filter 
+    // course_data* filtered_courses[course_indices->size];
+    // course_data** fc = filtered_courses;
+
+    course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
+    if (fc == NULL) return NULL; 
+
+    int* indices = course_indices->values; 
+
+    for(int i = 0; i < course_indices->size; i++){
+        fc[i] = malloc(sizeof(course_data)); 
+        if (fc[i] == NULL) return NULL; 
+
+        fc[i]->course_info = malloc(sizeof(char)*strlen(courses[*indices]->course_info)); 
+       
+        strcpy(fc[i]->course_info, courses[*indices]->course_info); 
+        strcpy(fc[i]->course_id, courses[*indices]->course_id); 
+        strcpy(fc[i]->prof, courses[*indices]->prof); 
+        fc[i]->enrollment = courses[*indices]->enrollment; 
+        fc[i]->quality = courses[*indices]->quality; 
+        fc[i]->difficulty = courses[*indices]->difficulty;
+        fc[i]->instructor_quality = courses[*indices]->instructor_quality;
+
+        indices++; 
+    }
+
+    // create new data container for filtered courses 
+    data_container* data_filtered = malloc(sizeof(data_container)); 
+    data_filtered->length = course_indices->size; 
+    data_filtered->data = fc; 
+
+    print_courses(fc, course_indices->size);
+
+    return data_filtered; 
+}
+
+data_container* filter(data_container* data, post_request* pr){
+    char* field = pr->field; // field for filtering 
+
+    if(strcmp(field, "coursenumber") == 0)
+        return  filter_course_number(pr, data); 
+    // consider different fields 
+    return NULL; 
+}
+
+
+data_container* post_process(data_container* data, post_request* pr){
+    // Edge case: check if field type is not NULL
+    if(pr->field_type == NULL){
+        return NULL;
+    }
+
+    // filter data 
+    if(strcmp(pr->field_type, "searchfield")==0) 
+        return filter(data, pr);
+    // add way to access sort based on field type  
+    return NULL; 
+}
+
+void print_post_request(post_request* pr){
+    printf("Search string: %s\n", pr->search);  
+    printf("Field type: %s\n", pr->field_type);
+    printf("Field: %s\n", pr->field); 
+}
 
 void print_request(parsed_request pr) {
     printf("Request Type: %s\n", pr.request_type);
@@ -67,4 +182,12 @@ void print_request(parsed_request pr) {
     printf("Host: %s\n", pr.host);
     printf("Rest:\n%s\n\n", pr.rest);
 }
+
+// void free(){
+
+// }
+
   
+
+  
+

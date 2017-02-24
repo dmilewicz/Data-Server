@@ -66,10 +66,6 @@ int start_server(int PORT_NUMBER)
     
     data_to_HTML(data);
     
-    
-    
-    
-    
     while(1) {
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
@@ -102,17 +98,23 @@ int start_server(int PORT_NUMBER)
 //            printf("This is the incoming request:\n%s\n\n", request);
             
             parsed_request* pr = parse_request(request);
+            post_request* post_req = malloc(sizeof(post_request));
+            data_container* pd = NULL;  
             
             print_request(*pr);
             if (  isPost(pr)  ) {
                 pr->postdata = get_variables(pr->rest);
-                printf("POST data: %s\n", pr->postdata);
-                
-                
-                
-                
-                
-                
+                printf("POST data: \n%s\n", pr->postdata);   
+                parse_post(post_req, pr->postdata);
+                print_post_request(post_req);
+                pd = post_process(data, post_req);
+                if(pd!=NULL){
+                    // print_courses(pd->data,pd->length); 
+                    data_to_HTML(pd);
+                    // free_data_container(pd); 
+                }
+                else
+                    data_to_HTML(data);
             }
                 
             
