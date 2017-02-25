@@ -11,8 +11,13 @@
 
 
 
-
-
+/*
+ ********************************************
+ *
+ *  Quicksort functions
+ *
+ ********************************************
+ */
 
 
 void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) ) {
@@ -25,20 +30,20 @@ void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data
 }
 
 
-
-
 int partition_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) ) {
     course_data* pivot = data[p];
     
     int i = p+1, j = r;
     
     while( i < j) {
-        printf("%d\n", p);
-        printf("i: %d, j: %d\n", i,j);
-        printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
+//        printf("%d\n", p);
+//        printf("i: %d, j: %d\n", i,j);
+//        printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
+        
+        
         while(i <= j && compare(data[i], pivot) <= 0) {
             i++;
-            printf("i: %d\n", i);
+//            printf("i: %d\n", i);
         }
         while(i <= j && compare(data[j], pivot) > 0) j--;
         
@@ -49,6 +54,22 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     return j;
     
 }
+
+
+void swap(course_data** arr, int a, int b) {
+    course_data* temp = arr[a];
+    arr[a] = arr[b];
+    arr[b] = temp;
+}
+
+
+/*
+ ********************************************
+ *
+ *  Comparison functions
+ *
+ ********************************************
+ */
 
 int compare_course_id(course_data* a, course_data* b) {
     return strcmp(a->course_id, b->course_id);
@@ -75,16 +96,51 @@ int compare_instructor_quality(course_data* a, course_data* b) {
 }
 
 
+/*
+ ********************************************
+ *
+ *  Average functions
+ *
+ ********************************************
+ */
 
-
-
-
-
-
-void swap(course_data** arr, int a, int b) {
-    course_data* temp = arr[a];
-    arr[a] = arr[b];
-    arr[b] = temp;
+int average_enrollment(data_container* d) {
+    int sum = 0;
+    
+    for (int i = 0; i < d->length; i++) sum += d->data[i]->enrollment;
+    
+    return sum / d->length;
 }
+
+double average_difficulty(data_container* d) {
+    double sum = 0;
+    
+    for ( int i = 0; i < d->length; i++) sum += d->data[i]->difficulty;
+    
+    return sum / d->length;
+}
+
+double average_quality(data_container* d) {
+    double sum = 0;
+    
+    for ( int i = 0; i < d->length; i++) sum += d->data[i]->quality;
+    
+    return sum / d->length;
+}
+
+double average_instructor_quality(data_container* d) {
+    double sum = 0;
+    
+    for ( int i = 0; i < d->length; i++) sum += d->data[i]->instructor_quality;
+    
+    return sum / d->length;
+}
+
+
+
+
+
+
+
 
 

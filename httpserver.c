@@ -55,15 +55,9 @@ int start_server(int PORT_NUMBER)
     
     
     
-    printf("sorting data...");
+//    printf("sorting data...");
     
-    quicksort_data(data->data, 0, data->length - 1, compare_professors);
-//    printf("%d\n", partition_data(data->data, 0, data->length-1, compare_enrollment));
-    
-    
-//    swap(data->data, 0, 1);
-    
-    
+//    quicksort_data(data->data, 0, data->length - 1, compare_professors);
     data_to_HTML(data);
     
     
@@ -113,6 +107,39 @@ int start_server(int PORT_NUMBER)
                 
                 
                 
+                
+                
+                
+//                int (*comparep) (course_data*, course_data*);
+                
+                
+//                switch(process_sort()) {
+//                    case 0:
+//                        comparep = compare_course_id;
+//                        break;
+//                    case 1:
+//                        comparep = compare_professors;
+//                        break;
+//                    case 2:
+//                        comparep = compare_enrollment;
+//                        break;
+//                    case 3:
+//                        comparep = compare_quality;
+//                        break;
+//                    case 4:
+//                        comparep = compare_dificulty;
+//                        break;
+//                    case 5:
+//                        comparep = compare_instructor_quality;
+//                        break;
+//                }
+                
+                
+//                quicksort_data(data->data, 0, data->length - 1, comparep);
+
+                
+                
+                
             }
                 
             
@@ -121,7 +148,9 @@ int start_server(int PORT_NUMBER)
             
             //read in HTML file
             char* resource = readHTML("index.html");
-
+            
+            char* footer = "</body></html>";
+            
             // parse data into structure and format data into html 
             char* data = readHTML("data.html");
             
@@ -131,7 +160,8 @@ int start_server(int PORT_NUMBER)
             // 6. send: send the outgoing message (response) over the socket
             send(fd, header, strlen(header), 0);
             send(fd, resource, strlen(resource), 0);
-            send(fd, data, strlen(data), 0);  
+            send(fd, data, strlen(data), 0);
+            send(fd, footer, strlen(footer), 0);
         }
         // 7. close: close the connection
         close(fd);
