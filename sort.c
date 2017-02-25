@@ -29,13 +29,17 @@ void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data
     
 }
 
-
+/*
+ * partition function for the Quicksort operations
+ */
 int partition_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) ) {
     course_data* pivot = data[p];
     
     int i = p+1, j = r;
     
     while( i < j) {
+        
+        // printing functions used for debugging
 //        printf("%d\n", p);
 //        printf("i: %d, j: %d\n", i,j);
 //        printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);

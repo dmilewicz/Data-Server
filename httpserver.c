@@ -19,6 +19,12 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include "parse.h"
 #include "sort.h"
 
+
+
+
+
+
+
 int start_server(int PORT_NUMBER)
 {
 
@@ -63,7 +69,7 @@ int start_server(int PORT_NUMBER)
     while(1) {
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
-        if (listen(sock, 1) == -1) {
+        if (listen(sock, 10) == -1) {
             perror("Listen");
             exit(1);
         }
@@ -92,18 +98,17 @@ int start_server(int PORT_NUMBER)
 //            printf("This is the incoming request:\n%s\n\n", request);
             
             parsed_request* pr = parse_request(request);
-            post_request* post_req = malloc(sizeof(post_request));
-            data_container* pd = NULL;  
+post_request* post_req = malloc(sizeof(post_request));
+                data_container* pd = NULL;
             
             print_request(*pr);
             if (  isPost(pr)  ) {
                 pr->postdata = get_variables(pr->rest);
-<<<<<<< HEAD
-                printf("POST data: %s\n", pr->postdata);
+//                printf("POST data: %s\n", pr->postdata);
                 
                 
                 
-                
+                // fd
                 
                 
                 
@@ -139,9 +144,8 @@ int start_server(int PORT_NUMBER)
                 
                 
                 
-=======
-                printf("POST data: \n%s\n", pr->postdata);   
-                parse_post(post_req, pr->postdata);
+//                printf("POST dat herea: \n%s\n", pr->postdata);
+                parse_post(post_req, pr->rest);
                 print_post_request(post_req);
                 pd = post_process(data, post_req);
                 if(pd!=NULL){
@@ -151,7 +155,6 @@ int start_server(int PORT_NUMBER)
                 }
                 else
                     data_to_HTML(data);
->>>>>>> af01367b585ed5805d5ca674b83d12520f2cdeea
             }
                 
             

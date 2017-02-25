@@ -31,11 +31,12 @@ parsed_request* parse_request(char* request_str);
 void print_request(parsed_request pr);
 char* get_variables(char* rest);
 int isPost(parsed_request* p);
-char* get_post(char* pr); 
+char* get_post(char* pr);
+int copy_data(course_data* src, course_data* dest);
 post_request* parse_post(post_request* pr, char* string);
 void print_post_request(post_request* pr); 
 data_container* post_process(data_container* data, post_request* pr); 
-data_container* filter(data_container* data, post_request* pr); 
-data_container* filter_course_number(post_request* pr, data_container* container); 
+data_container* filter_course_number(post_request* pr, data_container* container);
+data_container* filter(data_container* data, post_request* pr);
 
 

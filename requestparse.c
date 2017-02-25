@@ -43,10 +43,12 @@ parsed_request* parse_request(char* request_str) {
         
 }
 
+
+
 char* get_variables(char* rest) {
     
     int i = 0;
-    while (rest[i] != '\n') i++;
+    while (rest[i] != '\n' || rest[i+1] != '\n') i++;
     
     rest[i] = '\0';
     rest[i+1] = '\0';
@@ -123,15 +125,7 @@ data_container* filter_course_number(post_request* pr, data_container* data){
         fc[i] = malloc(sizeof(course_data)); 
         if (fc[i] == NULL) return NULL; 
 
-        fc[i]->course_info = malloc(sizeof(char)*strlen(courses[*indices]->course_info)); 
-       
-        strcpy(fc[i]->course_info, courses[*indices]->course_info); 
-        strcpy(fc[i]->course_id, courses[*indices]->course_id); 
-        strcpy(fc[i]->prof, courses[*indices]->prof); 
-        fc[i]->enrollment = courses[*indices]->enrollment; 
-        fc[i]->quality = courses[*indices]->quality; 
-        fc[i]->difficulty = courses[*indices]->difficulty;
-        fc[i]->instructor_quality = courses[*indices]->instructor_quality;
+        if (copy_data(courses[*indices], fc[i]) != 0) return NULL;
 
         indices++; 
     }
@@ -146,6 +140,25 @@ data_container* filter_course_number(post_request* pr, data_container* data){
     return data_filtered; 
 }
 
+
+int copy_data(course_data* src, course_data* dest) {
+    
+    dest->course_info = malloc(sizeof(char)* (strlen(src->course_info)));
+    if (dest->course_info == NULL) return -1;
+    
+    strcpy(dest->course_info, src->course_info);
+    strcpy(dest->course_id, src->course_id);
+    strcpy(dest->prof, src->prof);
+    dest->enrollment = src->enrollment;
+    dest->quality = src->quality;
+    dest->difficulty = src->difficulty;
+    dest->instructor_quality = src->instructor_quality;
+    
+    return 0;
+}
+
+
+
 data_container* filter(data_container* data, post_request* pr){
     char* field = pr->field; // field for filtering 
 
@@ -154,6 +167,8 @@ data_container* filter(data_container* data, post_request* pr){
     // consider different fields 
     return NULL; 
 }
+
+
 
 
 data_container* post_process(data_container* data, post_request* pr){
@@ -183,9 +198,9 @@ void print_request(parsed_request pr) {
     printf("Rest:\n%s\n\n", pr.rest);
 }
 
-// void free(){
+ void free(){
 
-// }
+ }
 
   
 
