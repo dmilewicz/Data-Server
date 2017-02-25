@@ -29,9 +29,7 @@ typedef struct data {
     size_t length;
 } data_container;
 
-
-
-
+void print_courses(course_data** courses, int size); 
 int parse (char* str, course_data* data);
 void data_to_HTML(data_container* data);
 data_container* parse_data(char* filename);

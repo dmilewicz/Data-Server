@@ -15,14 +15,14 @@
 #include "readHTML.h"
 #include "parse.h"
 
-void print_courses(course_data* courses, int size){
+void print_courses(course_data** courses, int size){
 	for(int i = 0; i < size; i++){
-		printf("COURSE ID: %s\n",courses[i].course_id);
-		printf("INSTRUCTOR: %s\n", courses[i].prof); 
-		printf("ENROLLMENT: %d\n", courses[i].enrollment);
-		printf("QUALITY: %f\n", courses[i].quality);
-		printf("DIFFICULTY: %f\n", courses[i].difficulty);
-		printf("QUALITY (I): %f\n", courses[i].instructor_quality);
+		printf("COURSE ID: %s\n",courses[i]->course_id); 
+		printf("INSTRUCTOR: %s\n", courses[i]->prof); 
+		printf("ENROLLMENT: %d\n", courses[i]->enrollment);
+		printf("QUALITY: %f\n", courses[i]->quality);
+		printf("DIFFICULTY: %f\n", courses[i]->difficulty);
+		printf("QUALITY (I): %f\n", courses[i]->instructor_quality);
 		printf("\n");
 	}
 }
@@ -103,7 +103,6 @@ data_container* parse_data(char* filename){
 		while(count != 6){
 			if(count == 0){
 				temp = strtok(course_info, ",");  
-
 				strcpy(courses[index]->course_id, temp);
 				// temp = strcat(open_data_tag, courses[index].course_id); 
 				// temp = strcat(temp, closed_data_tag); 
@@ -113,7 +112,6 @@ data_container* parse_data(char* filename){
 			if(count == 1){
 				temp = strtok(NULL, ","); 
 				temp++; 
-
 				strcpy(courses[index]->prof, temp); 
 				// printf("%s\n", courses[index].prof);
 			}
@@ -121,7 +119,6 @@ data_container* parse_data(char* filename){
 			if(count == 2){
 				temp = strtok(NULL, ","); 
 				temp++; 
-
 				courses[index]->enrollment = atoi(temp);
 				// printf("%d\n", courses[index].enrollment);	
 			}
@@ -136,7 +133,6 @@ data_container* parse_data(char* filename){
 			if(count == 4){
 				temp = strtok(NULL, ","); 
 				temp++; 
-
 				courses[index]->difficulty = strtod(temp, NULL); 
 				// printf("%f\n", courses[index].difficulty);
 			}
@@ -144,7 +140,6 @@ data_container* parse_data(char* filename){
 			if(count == 5){
 				temp = strtok(NULL, "\n"); 
 				temp++; 
-
 				courses[index]->instructor_quality = strtod(temp, NULL); 
 				// printf("%f\n", courses[index].instructor_quality);	
 			}
@@ -166,7 +161,6 @@ data_container* parse_data(char* filename){
     course_data->data = courses;
     course_data->length = index;
     
-    
     // close files
     fclose(courses_file);
     return course_data;
@@ -180,9 +174,7 @@ void data_to_HTML(data_container* data) {
     
     // data file to write to. Could configure it straight into a string but the size will have to be variable (this is simpler).
     FILE* data_file = fopen("data.html","w");
-    
-    
-    
+     
     // write header to data.html file
     char* header = "<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n";
     
@@ -191,8 +183,7 @@ void data_to_HTML(data_container* data) {
     // initialize open and close row/data tags
     char* open_row_tag = "<tr>\n";
     char* closed_row_tag = "</tr>\n";
-        
-        
+            
     // define data tag
     char* open_data_tag = "<td> ";
     char* closed_data_tag = "</td>\n";
