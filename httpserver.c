@@ -103,7 +103,7 @@ post_request* post_req = malloc(sizeof(post_request));
             
             print_request(*pr);
             if (  isPost(pr)  ) {
-                pr->postdata = get_variables(pr->rest);
+//                pr->postdata = get_variables(pr->rest);
 //                printf("POST data: %s\n", pr->postdata);
                 
                 
@@ -144,7 +144,6 @@ post_request* post_req = malloc(sizeof(post_request));
                 
                 
                 
-//                printf("POST dat herea: \n%s\n", pr->postdata);
                 parse_post(post_req, pr->rest);
                 print_post_request(post_req);
                 pd = post_process(data, post_req);

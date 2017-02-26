@@ -65,6 +65,7 @@ int isPost(parsed_request* p) {
 char* get_post(char* pr){
     char* search = "search";
     char* post = strstr(pr, search);
+    printf("%s", post);
     return post; 
 }
 
@@ -141,6 +142,12 @@ data_container* filter_course_number(post_request* pr, data_container* data){
 }
 
 
+
+
+
+
+
+
 int copy_data(course_data* src, course_data* dest) {
     
     dest->course_info = malloc(sizeof(char)* (strlen(src->course_info)));
@@ -201,6 +208,9 @@ void print_request(parsed_request pr) {
  void free(){
 
  }
+
+
+
 
   
 
