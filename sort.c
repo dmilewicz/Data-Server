@@ -8,13 +8,6 @@
 
 #include "sort.h"
 
-
-
-
-
-
-
-
 void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) ) {
     if (p >= r) return;
     
@@ -24,21 +17,18 @@ void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data
     
 }
 
-
-
-
 int partition_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) ) {
     course_data* pivot = data[p];
     
     int i = p+1, j = r;
     
     while( i < j) {
-        printf("%d\n", p);
-        printf("i: %d, j: %d\n", i,j);
-        printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
+        // printf("%d\n", p);
+        // printf("i: %d, j: %d\n", i,j);
+        // printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
         while(i <= j && compare(data[i], pivot) <= 0) {
             i++;
-            printf("i: %d\n", i);
+            // printf("i: %d\n", i);
         }
         while(i <= j && compare(data[j], pivot) > 0) j--;
         
@@ -66,20 +56,13 @@ int compare_quality(course_data* a, course_data* b) {
     return a->instructor_quality - b->instructor_quality;
 }
 
-int compare_dificulty(course_data* a, course_data* b) {
+int compare_difficulty(course_data* a, course_data* b) {
     return a->difficulty - b->difficulty;
 }
 
 int compare_instructor_quality(course_data* a, course_data* b) {
     return a->instructor_quality - b->instructor_quality;
 }
-
-
-
-
-
-
-
 
 void swap(course_data** arr, int a, int b) {
     course_data* temp = arr[a];
