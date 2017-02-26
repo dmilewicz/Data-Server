@@ -11,8 +11,6 @@
 #include "parse.h"
 #include "arraylist.h"
 
-
-
 parsed_request* parse_request(char* request_str) {
     parsed_request* incoming_request = malloc(sizeof(parsed_request));
     
@@ -98,18 +96,9 @@ post_request* parse_post(post_request* pr, char* string){
     return pr;
 }
 
-data_container* filter_enrollment(post_request* pr, data_container* data){
-    course_data** courses = data->data; // courses 
-    arraylist* course_indices = al_initialize(2); // array list of course indices 
-
-    // check to see if enrollment number matches 
-    int request = atoi(pr->search);
-    for(int i = 0; i < data->length; i++){
-        if(request == courses[i]->enrollment){
-            al_add(course_indices, i); 
-        }
-    }
-
+data_container* array_to_data(void* list, course_data** courses){
+    
+    arraylist* course_indices = (arraylist*) list; 
     course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
     if (fc == NULL) return NULL; 
 
@@ -138,9 +127,21 @@ data_container* filter_enrollment(post_request* pr, data_container* data){
     data_filtered->length = course_indices->size; 
     data_filtered->data = fc; 
 
-    print_courses(fc, course_indices->size);
-
     return data_filtered; 
+}
+
+data_container* filter_enrollment(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // check to see if enrollment number matches 
+    int request = atoi(pr->search);
+    for(int i = 0; i < data->length; i++){
+        if(request == courses[i]->enrollment){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses); 
 }
 
 data_container* filter_instructor(post_request* pr, data_container* data){
@@ -157,8 +158,6 @@ data_container* filter_instructor(post_request* pr, data_container* data){
         }
     }
 
-    // printf("%s\n", pr->search);
-
     // store course indices of matched strings 
     for(int i = 0; i < data->length; i++){
         check = strstr(courses[i]->prof, pr->search); 
@@ -166,38 +165,7 @@ data_container* filter_instructor(post_request* pr, data_container* data){
             al_add(course_indices, i); 
         }
     }
-
-    course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
-    if (fc == NULL) return NULL; 
-
-    int* indices = course_indices->values; 
-
-    for(int i = 0; i < course_indices->size; i++){
-        fc[i] = malloc(sizeof(course_data)); 
-        if (fc[i] == NULL) return NULL; 
-
-        fc[i]->course_info = malloc(sizeof(char)*(strlen(courses[*indices]->course_info)+1)); 
-        if(fc[i]->course_info == NULL) return NULL; 
-       
-        strcpy(fc[i]->course_info, courses[*indices]->course_info); 
-        strcpy(fc[i]->course_id, courses[*indices]->course_id); 
-        strcpy(fc[i]->prof, courses[*indices]->prof); 
-        fc[i]->enrollment = courses[*indices]->enrollment; 
-        fc[i]->quality = courses[*indices]->quality; 
-        fc[i]->difficulty = courses[*indices]->difficulty;
-        fc[i]->instructor_quality = courses[*indices]->instructor_quality;
-
-        indices++; 
-    }
-
-    // create new data container for filtered courses 
-    data_container* data_filtered = malloc(sizeof(data_container)); 
-    data_filtered->length = course_indices->size; 
-    data_filtered->data = fc; 
-
-    print_courses(fc, course_indices->size);
-
-    return data_filtered;  
+    return array_to_data(course_indices, courses);  
 }
 
 data_container* filter_course_number(post_request* pr, data_container* data){
@@ -211,42 +179,7 @@ data_container* filter_course_number(post_request* pr, data_container* data){
             al_add(course_indices, i); 
         }
     }
-
-    // create array of courses based on filter 
-    // course_data* filtered_courses[course_indices->size];
-    // course_data** fc = filtered_courses;
-
-    course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
-    if (fc == NULL) return NULL; 
-
-    int* indices = course_indices->values; 
-
-    for(int i = 0; i < course_indices->size; i++){
-        fc[i] = malloc(sizeof(course_data)); 
-        if (fc[i] == NULL) return NULL; 
-
-        fc[i]->course_info = malloc(sizeof(char)*(strlen(courses[*indices]->course_info)+1)); 
-        if(fc[i]->course_info == NULL) return NULL; 
-       
-        strcpy(fc[i]->course_info, courses[*indices]->course_info); 
-        strcpy(fc[i]->course_id, courses[*indices]->course_id); 
-        strcpy(fc[i]->prof, courses[*indices]->prof); 
-        fc[i]->enrollment = courses[*indices]->enrollment; 
-        fc[i]->quality = courses[*indices]->quality; 
-        fc[i]->difficulty = courses[*indices]->difficulty;
-        fc[i]->instructor_quality = courses[*indices]->instructor_quality;
-
-        indices++; 
-    }
-
-    // create new data container for filtered courses 
-    data_container* data_filtered = malloc(sizeof(data_container)); 
-    data_filtered->length = course_indices->size; 
-    data_filtered->data = fc; 
-
-    print_courses(fc, course_indices->size);
-
-    return data_filtered; 
+    return array_to_data(course_indices, courses);
 }
 
 data_container* filter(data_container* data, post_request* pr){

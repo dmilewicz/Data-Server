@@ -39,5 +39,6 @@ data_container* filter(data_container* data, post_request* pr);
 data_container* filter_course_number(post_request* pr, data_container* container); 
 data_container* filter_instructor(post_request* pr, data_container* data);
 data_container* filter_enrollment(post_request* pr, data_container* data); 
+data_container* array_to_data(void* course_indices, course_data** courses); 
 
 
