@@ -37,5 +37,7 @@ void print_post_request(post_request* pr);
 data_container* post_process(data_container* data, post_request* pr); 
 data_container* filter(data_container* data, post_request* pr); 
 data_container* filter_course_number(post_request* pr, data_container* container); 
+data_container* filter_instructor(post_request* pr, data_container* data);
+data_container* filter_enrollment(post_request* pr, data_container* data); 
 
 

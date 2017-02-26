@@ -98,7 +98,10 @@ int start_server(int PORT_NUMBER)
 //            printf("This is the incoming request:\n%s\n\n", request);
             
             parsed_request* pr = parse_request(request);
+            
             post_request* post_req = malloc(sizeof(post_request));
+            if(post_req == NULL) return 0; 
+
             data_container* pd = NULL;  
             
             print_request(*pr);
