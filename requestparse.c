@@ -91,30 +91,34 @@ post_request* parse_post(post_request* pr, char* string){
         if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
         else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;
         else if (strcmp(tokens[i], "search") == 0) pr->filter_parameters = val;
+        
+        
     }
     
 
     // store search filter string and field type 
-    if(tokens[0]!=NULL){
-        char* check = strstr(tokens[0], "&"); 
-        // printf("%s\n", check);
-        if(check != NULL){
-            pr->filter_parameter = strtok(tokens[0],"&"); 
-            // handle sort case 
-            if(strcmp(pr->filter_parameter, "sortfield") == 0){
-                pr->field_type = pr->filter_parameter; 
-                pr->filter_parameter = NULL; 
-            }
-            else
-                pr->field_type = strtok(NULL, "&"); 
-            pr->field = tokens[1];
-        }
-        else{
-            pr->filter_parameter = tokens[0];
-        }
-    }
+//    if(tokens[0]!=NULL){
+//        char* check = strstr(tokens[0], "&"); 
+//        // printf("%s\n", check);
+//        if(check != NULL){
+//            pr->filter_parameter = strtok(tokens[0],"&"); 
+//            // handle sort case 
+//            if(strcmp(pr->filter_parameter, "sortfield") == 0){
+//                pr->field_type = pr->filter_parameter; 
+//                pr->filter_parameter = NULL; 
+//            }
+//            else
+//                pr->field_type = strtok(NULL, "&"); 
+//            pr->field = tokens[1];
+//        }
+//        else{
+//            pr->filter_parameter = tokens[0];
+//        }
+//    }
     return pr;
 }
+
+
 
 data_container* array_to_data(void* list, course_data** courses){
     arraylist* course_indices = (arraylist*) list; 
