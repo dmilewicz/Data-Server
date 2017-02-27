@@ -98,7 +98,7 @@ int start_server(int PORT_NUMBER)
 //            printf("This is the incoming request:\n%s\n\n", request);
             
             parsed_request* pr = parse_request(request);
-
+            
             
             post_request* post_req = malloc(sizeof(post_request));
             if(post_req == NULL) return 0; 
@@ -109,7 +109,7 @@ int start_server(int PORT_NUMBER)
             if (  isPost(pr)  ) {
 //                pr->postdata = get_variables(pr->rest);
 //                printf("POST data: %s\n", pr->postdata);
-                
+                parse_post(post_req, pr->rest);
                 
                 
                 // fd
@@ -117,11 +117,11 @@ int start_server(int PORT_NUMBER)
                 
                 
                 
+                int (*comparep) (course_data*, course_data*);
                 
-//                int (*comparep) (course_data*, course_data*);
+                comparep = choose_sort(post_req);
                 
-                
-//                switch(process_sort()) {
+//                switch(process_sort(post_req)) {
 //                    case 0:
 //                        comparep = compare_course_id;
 //                        break;
@@ -135,22 +135,24 @@ int start_server(int PORT_NUMBER)
 //                        comparep = compare_quality;
 //                        break;
 //                    case 4:
-//                        comparep = compare_dificulty;
+//                        comparep = compare_difficulty;
 //                        break;
 //                    case 5:
 //                        comparep = compare_instructor_quality;
 //                        break;
+//                    default:
+//                        comparep = NULL;
 //                }
                 
-                
-//                quicksort_data(data->data, 0, data->length - 1, comparep);
+                if (comparep != NULL)
+                    quicksort_data(data->data, 0, data->length - 1, comparep);
 
+                pd = choose_filter(data, post_req);
                 
                 
                 
-                parse_post(post_req, pr->rest);
                 print_post_request(post_req);
-                pd = post_process(data, post_req);
+//                pd = post_process(data, post_req);
                 if(pd!=NULL){
                     // print_courses(pd->data,pd->length); 
                     data_to_HTML(pd);
