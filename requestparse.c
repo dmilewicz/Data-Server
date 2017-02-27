@@ -86,7 +86,7 @@ post_request* parse_post(post_request* pr, char* string){
     
     char* val;
     for (int i = 0; i < index; i++) {
-        val = strtok(tokens[i], "&");
+        val = strtok(tokens[i], "=");
         
         if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
         else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;
