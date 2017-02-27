@@ -10,8 +10,7 @@
 #include "requestparse.h"
 #include "parse.h"
 #include "arraylist.h"
-
-
+#include "sort.h"
 
 parsed_request* parse_request(char* request_str) {
     parsed_request* incoming_request = malloc(sizeof(parsed_request));
@@ -46,7 +45,6 @@ parsed_request* parse_request(char* request_str) {
 
 
 char* get_variables(char* rest) {
-    
     int i = 0;
     while (rest[i] != '\n' || rest[i+1] != '\n') i++;
     
@@ -73,17 +71,30 @@ char* get_post(char* pr){
 post_request* parse_post(post_request* pr, char* string){
     char* post_string = get_post(string); 
     // printf("%s\n",post_string);
-    char* delim = "=";
-    char* tokens[10]; 
+    char* delim = "&";
+    char* tokens[3];
     int index = 0; 
     char* temp = strtok(post_string, delim);
 
     while(temp != NULL){
         temp = strtok(NULL, delim);
-        tokens[index] = temp; 
+        tokens[index] = temp;
         printf("%s\n", tokens[index]); 
         index++; 
     }
+    
+    
+    char* val;
+    for (int i = 0; i < index; i++) {
+        val = strtok(tokens[i], "&");
+        
+        if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
+        else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;
+        else if (strcmp(tokens[i], "search") == 0) pr->filter_parameters = val;
+        
+        
+    }
+    
 
     // store search filter string and field type 
     if(tokens[0]!=NULL){
@@ -91,7 +102,13 @@ post_request* parse_post(post_request* pr, char* string){
         // printf("%s\n", check);
         if(check != NULL){
             pr->search = strtok(tokens[0],"&"); 
-            pr->field_type = strtok(NULL, "&"); 
+            // handle sort case 
+            if(strcmp(pr->search, "sortfield") == 0){
+                pr->field_type = pr->search; 
+                pr->search = NULL; 
+            }
+            else
+                pr->field_type = strtok(NULL, "&"); 
             pr->field = tokens[1];
         }
         else{
@@ -101,22 +118,8 @@ post_request* parse_post(post_request* pr, char* string){
     return pr;
 }
 
-data_container* filter_course_number(post_request* pr, data_container* data){
-    course_data** courses = data->data; // courses 
-    arraylist* course_indices = al_initialize(2); // array list of course indices 
-
-    // store course indices of matched strings 
-    for(int i = 0; i < data->length; i++){
-        char* check = strstr(courses[i]->course_id, pr->search); 
-        if(check != NULL){
-            al_add(course_indices, i); 
-        }
-    }
-
-    // create array of courses based on filter 
-    // course_data* filtered_courses[course_indices->size];
-    // course_data** fc = filtered_courses;
-
+data_container* array_to_data(void* list, course_data** courses){
+    arraylist* course_indices = (arraylist*) list; 
     course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
     if (fc == NULL) return NULL; 
 
@@ -128,6 +131,7 @@ data_container* filter_course_number(post_request* pr, data_container* data){
 
         if (copy_data(courses[*indices], fc[i]) != 0) return NULL;
 
+
         indices++; 
     }
 
@@ -135,8 +139,6 @@ data_container* filter_course_number(post_request* pr, data_container* data){
     data_container* data_filtered = malloc(sizeof(data_container)); 
     data_filtered->length = course_indices->size; 
     data_filtered->data = fc; 
-
-    print_courses(fc, course_indices->size);
 
     return data_filtered; 
 }
@@ -165,14 +167,147 @@ int copy_data(course_data* src, course_data* dest) {
 }
 
 
+data_container* filter_enrollment(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
 
-data_container* filter(data_container* data, post_request* pr){
+    // check to see if enrollment number matches 
+    int request = atoi(pr->search);
+    for(int i = 0; i < data->length; i++){
+        if(request == courses[i]->enrollment){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses); 
+}
+
+data_container* filter_instructor(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // check to see if string contains any spaces (+ in html) 
+    char* check; 
+    check = strstr(pr->search, "+");
+    if(check!=NULL){
+        char* s; 
+        for(s = pr->search;(s = strchr(s, 43)); s++){
+            *s = ' ';
+        }
+    }
+
+    // store course indices of matched strings 
+    for(int i = 0; i < data->length; i++){
+        check = strstr(courses[i]->prof, pr->search); 
+        if(check != NULL){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses);  
+}
+
+data_container* filter_course_number(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // store course indices of matched strings 
+    for(int i = 0; i < data->length; i++){
+        char* check = strstr(courses[i]->course_id, pr->search); 
+        if(check != NULL){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses);
+}
+
+data_container* choose_filter(data_container* data, post_request* pr){
     char* field = pr->field; // field for filtering 
 
+    // filter by course number 
     if(strcmp(field, "coursenumber") == 0)
-        return  filter_course_number(pr, data); 
-    // consider different fields 
+        return filter_course_number(pr, data);
+    // filter by instructor 
+    if(strcmp(field, "instructorname") == 0)
+        return filter_instructor(pr, data); 
+    // filter by enrollment
+    if(strcmp(field, "enrollment") == 0)
+        return filter_enrollment(pr, data); 
     return NULL; 
+}
+
+data_container* sort_course_number(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses
+    // sort by course id
+    quicksort_data(courses, 0, data->length - 1, compare_course_id);
+    return data;
+}
+
+data_container* sort_instructor(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses
+    // sort by course id
+    quicksort_data(courses, 0, data->length - 1, compare_professors);
+    return data;
+}
+
+data_container* sort_enrollment(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses
+    // sort by course id
+    quicksort_data(courses, 0, data->length - 1, compare_enrollment);
+    return data;
+}
+
+data_container* sort_quality(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses
+    // sort by course id
+    quicksort_data(courses, 0, data->length - 1, compare_quality);
+    return data;
+}
+
+data_container* sort_difficulty(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses
+    // sort by course id
+    quicksort_data(courses, 0, data->length - 1, compare_difficulty);
+    return data;
+}
+
+data_container* sort(data_container* data, post_request* pr){
+    // filter by course number 
+    if(strcmp(pr->field, "coursenumber") == 0)
+        return sort_course_number(pr, data);
+    // filter by instructor 
+    if(strcmp(pr->field, "instructorname") == 0)
+        return sort_instructor(pr, data); 
+    // filter by enrollment
+    if(strcmp(pr->field, "enrollment") == 0)
+        return sort_enrollment(pr, data); 
+    // sort by course quality 
+    if(strcmp(pr->field, "coursequalityhigh") == 0)
+        return sort_quality(pr, data); 
+    // sort by course difficulty 
+    if(strcmp(pr->field, "coursedifficultyhigh") == 0)
+        return sort_difficulty(pr, data); 
+    return NULL; 
+}
+
+
+
+
+int process_sort(post_request* pr){
+    // filter by course number
+    if(strcmp(pr->field, "coursenumber") == 0)
+        return 0;
+    // filter by instructor
+    if(strcmp(pr->field, "instructorname") == 0)
+        return 1;
+    // filter by enrollment
+    if(strcmp(pr->field, "enrollment") == 0)
+        return 2;
+    // sort by course quality
+    if(strcmp(pr->field, "coursequalityhigh") == 0)
+        return sort_quality(pr, data);
+    // sort by course difficulty
+    if(strcmp(pr->field, "coursedifficultyhigh") == 0)
+        return sort_difficulty(pr, data);
+    return NULL;
 }
 
 
@@ -183,11 +318,12 @@ data_container* post_process(data_container* data, post_request* pr){
     if(pr->field_type == NULL){
         return NULL;
     }
-
     // filter data 
     if(strcmp(pr->field_type, "searchfield")==0) 
         return filter(data, pr);
-    // add way to access sort based on field type  
+    // sort data
+    if(strcmp(pr->field_type, "sortfield")==0)
+        return sort(data,pr);  
     return NULL; 
 }
 

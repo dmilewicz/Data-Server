@@ -17,8 +17,6 @@
 #include "parse.h"
 
 
-
-
 void swap(course_data** arr, int a, int b);
 int partition_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) );
 
@@ -35,3 +33,4 @@ int average_enrollment(data_container* d);
 double average_difficulty(data_container* d);
 double average_quality(data_container* d);
 double average_instructor_quality(data_container* d);
+
