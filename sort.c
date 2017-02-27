@@ -39,7 +39,7 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     
     int i = p+1, j = r;
     
-    while( i < j) {
+    while( i <= j) {
         
         // printing functions used for debugging
 //        printf("%d\n", p);
@@ -93,11 +93,11 @@ int compare_enrollment(course_data* a, course_data* b) {
     return a->enrollment - b->enrollment;
 }
 
-int compare_quality(course_data* a, course_data* b) {
+int compare_quality_high(course_data* a, course_data* b) {
     return a->instructor_quality - b->instructor_quality;
 }
 
-int compare_difficulty(course_data* a, course_data* b) {
+int compare_difficulty_high(course_data* a, course_data* b) {
     return a->difficulty - b->difficulty;
 }
 
@@ -105,6 +105,13 @@ int compare_instructor_quality(course_data* a, course_data* b) {
     return a->instructor_quality - b->instructor_quality;
 }
 
+int compare_quality_low(course_data* a, course_data* b) {
+    return b->instructor_quality - a->instructor_quality;
+}
+
+int compare_difficulty_low(course_data* a, course_data* b) {
+    return b->difficulty - a->difficulty;
+}
 
 /*
  ********************************************

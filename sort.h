@@ -26,8 +26,10 @@ void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data
 int compare_course_id(course_data* a, course_data* b);
 int compare_professors(course_data* a, course_data* b);
 int compare_enrollment(course_data* a, course_data* b);
-int compare_quality(course_data* a, course_data* b);
-int compare_difficulty(course_data* a, course_data* b);
+int compare_quality_high(course_data* a, course_data* b);
+int compare_quality_low(course_data* a, course_data* b);
+int compare_difficulty_high(course_data* a, course_data* b);
+int compare_difficulty_low(course_data* a, course_data* b);
 int compare_instructor_quality(course_data* a, course_data* b);
 int average_enrollment(data_container* d);
 double average_difficulty(data_container* d);

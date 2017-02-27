@@ -47,6 +47,11 @@ int total_lines(char* file_name){
 }
 
 
+void print_data(data_container* data) {
+    print_courses(data->data, data->length);
+}
+
+
 data_container* parse_data(char* filename){
 
     // Initialize files
@@ -235,6 +240,8 @@ void data_to_HTML(data_container* data) {
     fclose(data_file);
     
 }
+
+
 
 
 

@@ -61,10 +61,10 @@ post_request* parse_post(post_request* pr, char* string){
     char* delim = "&";
     char* tokens[3];
     int index = 0;
+    
+    
+    // get the key-value pairs
     char* temp = strtok(post_string, delim);
-
-    
-    
     while(temp != NULL){
         
         tokens[index] = temp;
@@ -73,7 +73,7 @@ post_request* parse_post(post_request* pr, char* string){
         temp = strtok(NULL, delim);
     }
     
-    //
+    // set all fields to null
     init_post_request(pr);
     
     char* val;
@@ -126,19 +126,22 @@ void init_post_request(post_request* pr) {
 
 
 data_container* array_to_data(void* list, course_data** courses){
-    arraylist* course_indices = (arraylist*) list; 
+    arraylist* course_indices = (arraylist*) list;
     course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
     if (fc == NULL) return NULL; 
 
     int* indices = course_indices->values; 
 
     for(int i = 0; i < course_indices->size; i++){
-        fc[i] = malloc(sizeof(course_data)); 
-        if (fc[i] == NULL) return NULL; 
 
-        if (copy_data(courses[*indices + i], fc[i]) != 0) return NULL;
+        fc[i] = courses[indices[i]];
+        
+        
+        
+//        fc[i] = malloc(sizeof(course_data));
+//        if (fc[i] == NULL) return NULL; 
 
-
+//        if (copy_data(courses[*indices + i], fc[i]) != 0) return NULL;
 //        indices++; 
     }
 
@@ -151,21 +154,21 @@ data_container* array_to_data(void* list, course_data** courses){
 }
 
 
-int copy_data(course_data* src, course_data* dest) {
-    
-    dest->course_info = malloc(sizeof(char)* (strlen(src->course_info) + 1));
-    if (dest->course_info == NULL) return -1;
-    
-    strcpy(dest->course_info, src->course_info);
-    strcpy(dest->course_id, src->course_id);
-    strcpy(dest->prof, src->prof);
-    dest->enrollment = src->enrollment;
-    dest->quality = src->quality;
-    dest->difficulty = src->difficulty;
-    dest->instructor_quality = src->instructor_quality;
-    
-    return 0;
-}
+//int copy_data(course_data* src, course_data* dest) {
+//    
+//    dest->course_info = malloc(sizeof(char)* (strlen(src->course_info) + 1));
+//    if (dest->course_info == NULL) return -1;
+//    
+//    strcpy(dest->course_info, src->course_info);
+//    strcpy(dest->course_id, src->course_id);
+//    strcpy(dest->prof, src->prof);
+//    dest->enrollment = src->enrollment;
+//    dest->quality = src->quality;
+//    dest->difficulty = src->difficulty;
+//    dest->instructor_quality = src->instructor_quality;
+//    
+//    return 0;
+//}
 
 
 data_container* filter_enrollment(post_request* pr, data_container* data){
@@ -282,34 +285,36 @@ data_container* choose_filter(data_container* data, post_request* pr){
 
 
 
-int process_sort(post_request* pr, int (*comparep) (course_data*, course_data*)){
-    // filter by course number
-    if(strcmp(pr->sort_field, "coursenumber") == 0)
-        comparep = compare_course_id;
-        return 0;
-    // filter by instructor
-    if(strcmp(pr->sort_field, "instructorname") == 0)
-        comparep = compare_professors;
-        return 1;
-    // filter by enrollment
-    if(strcmp(pr->sort_field, "enrollment") == 0)
-        comparep = compare_enrollment;
-        return 2;
-    // sort by course quality
-    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
-        comparep = compare_quality;
-        return 3;
-    // sort by course difficulty
-    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
-        comparep = compare_difficulty;
-        return 4;
-    comparep = NULL;
-    return -1;
-}
+//int process_sort(post_request* pr, int (*comparep) (course_data*, course_data*)){
+//    // filter by course number
+//    if(strcmp(pr->sort_field, "coursenumber") == 0)
+//        comparep = compare_course_id;
+//        return 0;
+//    // filter by instructor
+//    if(strcmp(pr->sort_field, "instructorname") == 0)
+//        comparep = compare_professors;
+//        return 1;
+//    // filter by enrollment
+//    if(strcmp(pr->sort_field, "enrollment") == 0)
+//        comparep = compare_enrollment;
+//        return 2;
+//    // sort by course quality
+//    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
+//        comparep = compare_quality;
+//        return 3;
+//    // sort by course difficulty
+//    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
+//        comparep = compare_difficulty;
+//        return 4;
+//    comparep = NULL;
+//    return -1;
+//}
 
 
 
 void* choose_sort(post_request* pr){
+    if (pr->sort_field == NULL) return NULL;
+    
     // filter by course number
     if(strcmp(pr->sort_field, "coursenumber") == 0)
         return compare_course_id;
@@ -319,12 +324,18 @@ void* choose_sort(post_request* pr){
     // filter by enrollment
     if(strcmp(pr->sort_field, "enrollment") == 0)
         return compare_enrollment;
-    // sort by course quality
+    // sort by course quality high
     if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
-        return compare_quality;
-    // sort by course difficulty
+        return compare_quality_high;
+    // sort by course quality low
+    if(strcmp(pr->sort_field, "coursequalitylow") == 0)
+        return compare_quality_low;
+    // sort by course difficulty high
     if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
-        return compare_difficulty;
+        return compare_difficulty_high;
+    // sort by course difficulty low
+    if(strcmp(pr->sort_field, "coursedifficultylow") == 0)
+        return compare_difficulty_low;
     return NULL;
 }
 

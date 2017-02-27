@@ -108,13 +108,9 @@ int start_server(int PORT_NUMBER)
 //            printf("This is the incoming request:\n%s\n\n", request);
             
             parsed_request* pr = parse_request(request);
-            
-            
-            
-
-            
-            
             print_request(*pr);
+            
+            
             if (  isPost(pr)  ) {
 //                pr->postdata = get_variables(pr->rest);
 //                printf("POST data: %s\n", pr->postdata);
@@ -131,37 +127,13 @@ int start_server(int PORT_NUMBER)
                 print_post_request(post_req);
                 
                 
-                
-                
-                
-                
-//                switch(process_sort(post_req)) {
-//                    case 0:
-//                        comparep = compare_course_id;
-//                        break;
-//                    case 1:
-//                        comparep = compare_professors;
-//                        break;
-//                    case 2:
-//                        comparep = compare_enrollment;
-//                        break;
-//                    case 3:
-//                        comparep = compare_quality;
-//                        break;
-//                    case 4:
-//                        comparep = compare_difficulty;
-//                        break;
-//                    case 5:
-//                        comparep = compare_instructor_quality;
-//                        break;
-//                    default:
-//                        comparep = NULL;
-//                }
-                
-                
                 printf("Choosing filter...");
                 pd = choose_filter(data, post_req);
                 printf("done.\n");
+                
+                print_data(pd);
+                
+                printf("pd length: %zu\n", pd->length);
                 
                 printf("Choosing sort...");
                 comparep = choose_sort(post_req);
@@ -179,19 +151,16 @@ int start_server(int PORT_NUMBER)
                 if (comparep != NULL) {
                     
                     printf("sort request detected: sorting...");
-                    quicksort_data(pd->data, 0, data->length - 1, comparep);
+                    quicksort_data(pd->data, 0, pd->length - 1, comparep);
                 }
                 printf("done.\n");
                 
                 
-//                pd = post_process(data, post_req);
-                if(pd != NULL){
                     // print_courses(pd->data,pd->length); 
-                    data_to_HTML(pd);
+                data_to_HTML(pd);
                     // free_data_container(pd); 
-                }
-                else
-                    data_to_HTML(data);
+                
+                
             }
                 
             
@@ -219,8 +188,7 @@ int start_server(int PORT_NUMBER)
         close(fd);
         printf("Server closed connection\n");
 
-        // if(end==1)
-        //     break; 
+
     }
     
     free_data_container(data);

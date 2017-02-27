@@ -12,6 +12,7 @@
 #include <strings.h>
 #include "parse.h"
 
+
 typedef struct internetrequest {
     char* request_type;
     char* resource;
