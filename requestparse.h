@@ -36,7 +36,7 @@ void print_request(parsed_request pr);
 char* get_variables(char* rest);
 int isPost(parsed_request* p);
 char* get_post(char* pr);
-int copy_data(course_data* src, course_data* dest);
+data_container* copy_data(data_container* d);
 post_request* parse_post(post_request* pr, char* string);
 void print_post_request(post_request* pr); 
 data_container* post_process(data_container* data, post_request* pr); 

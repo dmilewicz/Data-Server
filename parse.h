@@ -31,7 +31,7 @@ typedef struct data {
 
 void print_courses(course_data** courses, int size); 
 int parse (char* str, course_data* data);
-void data_to_HTML(data_container* data);
+void data_to_HTML(data_container* data , char* data_target);
 data_container* parse_data(char* filename);
 void free_data_container(data_container* d);
 void print_data(data_container* data);

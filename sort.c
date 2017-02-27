@@ -93,23 +93,25 @@ int compare_enrollment(course_data* a, course_data* b) {
     return a->enrollment - b->enrollment;
 }
 
-int compare_quality_high(course_data* a, course_data* b) {
-    return a->instructor_quality - b->instructor_quality;
+double compare_quality_high(course_data* a, course_data* b) {
+    printf("dub: %f\n", a->instructor_quality - b->instructor_quality);
+    return a->quality - b->quality;
+//    return ((int)(1000.00 * a->instructor_quality)) - ((int)(1000.00 * b->instructor_quality));
 }
 
-int compare_difficulty_high(course_data* a, course_data* b) {
+double compare_difficulty_high(course_data* a, course_data* b) {
     return a->difficulty - b->difficulty;
 }
 
-int compare_instructor_quality(course_data* a, course_data* b) {
+double compare_instructor_quality(course_data* a, course_data* b) {
     return a->instructor_quality - b->instructor_quality;
 }
 
-int compare_quality_low(course_data* a, course_data* b) {
-    return b->instructor_quality - a->instructor_quality;
+double compare_quality_low(course_data* a, course_data* b) {
+    return b->quality - a->quality;
 }
 
-int compare_difficulty_low(course_data* a, course_data* b) {
+double compare_difficulty_low(course_data* a, course_data* b) {
     return b->difficulty - a->difficulty;
 }
 

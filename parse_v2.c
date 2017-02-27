@@ -175,10 +175,15 @@ data_container* parse_data(char* filename){
 
 
 
-void data_to_HTML(data_container* data) {
+void data_to_HTML(data_container* data , char* data_target) {
     
     // data file to write to. Could configure it straight into a string but the size will have to be variable (this is simpler).
-    FILE* data_file = fopen("data.html","w");
+    
+    
+    
+    
+    
+    FILE* data_file = fopen(data_target,"w");
      
     // write header to data.html file
     char* header = "<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n";

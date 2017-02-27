@@ -68,7 +68,7 @@ post_request* parse_post(post_request* pr, char* string){
     while(temp != NULL){
         
         tokens[index] = temp;
-        printf("keyval %d: %s\n", index, tokens[index]);
+//        printf("keyval %d: %s\n", index, tokens[index]);
         index++;
         temp = strtok(NULL, delim);
     }
@@ -80,9 +80,9 @@ post_request* parse_post(post_request* pr, char* string){
     for (int i = 0; i < index; i++) {
         val = strtok(tokens[i], "=");
         val = strtok(NULL, "=");
-        printf("tokens[%d]: %s\n", i, tokens[i]);
-        printf("val: %s\n", val);
-        printf("%s: %s \n", tokens[i], val);
+//        printf("tokens[%d]: %s\n", i, tokens[i]);
+//        printf("val: %s\n", val);
+//        printf("%s: %s \n", tokens[i], val);
         
         if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
         else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;
@@ -232,15 +232,38 @@ data_container* choose_filter(data_container* data, post_request* pr){
     
 //    printf("at filter \n");
     // filter by course number
-    if(strcmp(field, "coursenumber") == 0)
+    if (strcmp(field, "coursenumber") == 0)
         return filter_course_number(pr, data);
     // filter by instructor 
-    if(strcmp(field, "instructorname") == 0)
+    if (strcmp(field, "instructorname") == 0)
         return filter_instructor(pr, data); 
     // filter by enrollment
-    if(strcmp(field, "enrollment") == 0)
-        return filter_enrollment(pr, data); 
+    if (strcmp(field, "enrollment") == 0)
+        return filter_enrollment(pr, data);
+    if (strcmp(field, "coursequalityhigh") == 0) {
+        printf("TODO: implement coursequalityhigh\n");
+        return data;
+    }
+    if (strcmp(field, "coursedifficultyhigh") == 0) {
+        printf("TODO: implement coursedifficultyhigh\n");
+        return data;
+    }
     return data;
+}
+
+
+data_container* copy_data(data_container* d) {
+    data_container* new_container = malloc(sizeof(data_container));
+    if (new_container == NULL) return NULL;
+    
+    new_container->data = malloc(sizeof(course_data*) * d->length);
+    
+    for (int i = 0; i < d->length; i++) {
+        new_container->data[i] = d->data[i];
+    }
+    new_container->length = d->length;
+    
+    return new_container;
 }
 
 

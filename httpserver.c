@@ -20,6 +20,8 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include "sort.h"
 #include <pthread.h>
 
+
+void* respond(void* response_data);
 int end; // signal to stop the server
 
 void* stop(void* arg){
@@ -33,7 +35,19 @@ void* stop(void* arg){
     }
     free(input);
     pthread_exit(NULL); 
-} 
+}
+
+
+typedef struct threaddata {
+    char* header;
+    char* footer;
+    int fd;
+    data_container* data;
+} thread_data;
+
+
+
+
 
 int start_server(int PORT_NUMBER)
 {
@@ -69,12 +83,13 @@ int start_server(int PORT_NUMBER)
     unlink("data.html");
     data_container* data = parse_data("course_evals.txt");
     
+    char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
+    char* footer = "</body></html>";
+    
+    unsigned int request_count = 0;
     
     
-//    printf("sorting data...");
-    
-//    quicksort_data(data->data, 0, data->length - 1, compare_professors);
-    data_to_HTML(data);
+    data_to_HTML(data, "data.html");
     
     while(end != 1) {
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
@@ -97,95 +112,22 @@ int start_server(int PORT_NUMBER)
             printf("fd: %d\n", fd);
             printf("sock: %d\n\n", sock);
             
-            // buffer to read data into
-            char request[1024];
+            thread_data* pass_data = malloc(sizeof(thread_data));
+            pass_data->header = header;
+            pass_data->footer = footer;
+            pass_data->fd = fd;
+            pass_data->data = copy_data(data);
             
-            // 5. recv: read incoming message (request) into buffer
-            int bytes_received = recv(fd,request,1024,0);
-            // null-terminate the string
-            request[bytes_received] = '\0';
-            // print it to standard out
-//            printf("This is the incoming request:\n%s\n\n", request);
+            pthread_t* t1 = malloc(sizeof(pthread_t));
             
-            parsed_request* pr = parse_request(request);
-            print_request(*pr);
+            printf("creating thread");
+            pthread_create(t1, NULL, respond, pass_data);
+        
             
             
-            if (  isPost(pr)  ) {
-//                pr->postdata = get_variables(pr->rest);
-//                printf("POST data: %s\n", pr->postdata);
-                
-                post_request* post_req = malloc(sizeof(post_request));
-                if(post_req == NULL) return 0;
-                
-                data_container* pd = NULL;
-                
-                parse_post(post_req, pr->rest);
-                int (*comparep) (course_data*, course_data*);
-                
-                
-                print_post_request(post_req);
-                
-                
-                printf("Choosing filter...");
-                pd = choose_filter(data, post_req);
-                printf("done.\n");
-                
-                print_data(pd);
-                
-                printf("pd length: %zu\n", pd->length);
-                
-                printf("Choosing sort...");
-                comparep = choose_sort(post_req);
-                printf("done.\n");
-                
-                if (comparep == NULL) {
-                    printf("comparep is null!\n");
-                }
-                
-                
-                
-                
-                
-                printf("Evaluating sort...");
-                if (comparep != NULL) {
-                    
-                    printf("sort request detected: sorting...");
-                    quicksort_data(pd->data, 0, pd->length - 1, comparep);
-                }
-                printf("done.\n");
-                
-                
-                    // print_courses(pd->data,pd->length); 
-                data_to_HTML(pd);
-                    // free_data_container(pd); 
-                
-                
-            }
-                
-            
-            // this is the message that we'll send back
-            char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
-            
-            //read in HTML file
-            char* resource = readHTML("index.html");
-            
-            char* footer = "</body></html>";
-            
-            // parse data into structure and format data into html 
-            char* data = readHTML("data.html");
-            
-//            print file for testing
-//            printf("%s", resource);
-            
-            // 6. send: send the outgoing message (response) over the socket
-            send(fd, header, strlen(header), 0);
-            send(fd, resource, strlen(resource), 0);
-            send(fd, data, strlen(data), 0);
-            send(fd, footer, strlen(footer), 0);
         }
         // 7. close: close the connection
-        close(fd);
+//        close(fd);
         printf("Server closed connection\n");
 
 
@@ -225,5 +167,145 @@ int main(int argc, char *argv[])
   return 0; 
 }
 
-                   
+
+
+void* respond(void* response_data) {
+    
+   
+    thread_data* td = (thread_data*)response_data;
+    
+    
+    // buffer to read data into
+    char request[1024];
+    
+    // 5. recv: read incoming message (request) into buffer
+    int bytes_received = recv(td->fd,request,1024,0);
+    // null-terminate the string
+    request[bytes_received] = '\0';
+    // print it to standard out
+    //            printf("This is the incoming request:\n%s\n\n", request);
+    
+    parsed_request* pr = parse_request(request);
+    print_request(*pr);
+    
+    data_container* pd;
+    char filename[100];
+    
+    
+    
+    if (  isPost(pr)  ) {
+        //                pr->postdata = get_variables(pr->rest);
+        //                printf("POST data: %s\n", pr->postdata);
+        
+        post_request* post_req = malloc(sizeof(post_request));
+        if(post_req == NULL) return NULL;
+        
+        
+        parse_post(post_req, pr->rest);
+        int (*comparep) (course_data*, course_data*);
+        
+        
+        print_post_request(post_req);
+        
+        
+        printf("Choosing filter...");
+        pd = choose_filter(td->data, post_req);
+        printf("done.\n");
+        
+        print_data(pd);
+        
+        printf("pd length: %zu\n", pd->length);
+        
+        printf("Choosing sort...");
+        comparep = choose_sort(post_req);
+        printf("done.\n");
+        
+        if (comparep == NULL) {
+            printf("comparep is null!\n");
+        }
+        
+        
+        
+        
+        
+        printf("Evaluating sort...");
+        if (comparep != NULL) {
+            
+            printf("sort request detected: sorting...");
+            quicksort_data(pd->data, 0, pd->length - 1, comparep);
+        }
+        printf("done.\n");
+        
+        
+        sprintf(filename, "data%d.html", td->fd);
+        printf("filename: %s\n", filename);
+        data_to_HTML(pd, filename);
+        
+        
+    } else {
+        strcpy(filename,"data.html");
+    }
+    
+    
+    //read in HTML file
+    char* resource = readHTML("index.html");
+    
+    
+    // parse data into structure and format data into html
+    char* data = readHTML(filename);
+    
+    //            print file for testing
+    //            printf("%s", resource);
+    
+    // 6. send: send the outgoing message (response) over the socket
+    send(td->fd, td->header, strlen(td->header), 0);
+    send(td->fd, resource, strlen(resource), 0);
+    send(td->fd, data, strlen(data), 0);
+    send(td->fd, td->footer, strlen(td->footer), 0);
+    
+    
+    
+//    unlink(filename);
+    close(td->fd);
+    
+    return &td->fd;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
