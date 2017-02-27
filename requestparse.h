@@ -22,7 +22,7 @@ typedef struct internetrequest {
 } parsed_request;
 
 typedef struct PostResponse { 
-	char* search;
+	char* filter_parameter;
 	char* field_type; 
 	char* field;
     char* filter_parameters;
