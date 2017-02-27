@@ -42,17 +42,6 @@ parsed_request* parse_request(char* request_str) {
 
 
 
-char* get_variables(char* rest) {
-    int i = 0;
-    while (rest[i] != '\n' || rest[i+1] != '\n') i++;
-    
-    rest[i] = '\0';
-    rest[i+1] = '\0';
-    
-    return rest + i + 2;
-    
-}
-
 
 int isPost(parsed_request* p) {
     return strcmp(p->request_type, "POST") == 0;
@@ -69,16 +58,17 @@ char* get_post(char* pr){
 post_request* parse_post(post_request* pr, char* string){
     char* post_string = get_post(string); 
     // printf("%s\n",post_string);
-    char* delim = "=";
-    // char* delim = "&";
+    char* delim = "&";
     char* tokens[3];
     int index = 0;
     char* temp = strtok(post_string, delim);
 
+    
+    
     while(temp != NULL){
         
         tokens[index] = temp;
-//        printf("keyval %d: %s\n", index, tokens[index]);
+        printf("keyval %d: %s\n", index, tokens[index]);
         index++;
         temp = strtok(NULL, delim);
     }
@@ -90,9 +80,9 @@ post_request* parse_post(post_request* pr, char* string){
     for (int i = 0; i < index; i++) {
         val = strtok(tokens[i], "=");
         val = strtok(NULL, "=");
-//        printf("tokens[%d]: %s\n", i, tokens[i]);
-//        printf("val: %s\n", val);
-//        printf("%s: %s \n", tokens[i], val);
+        printf("tokens[%d]: %s\n", i, tokens[i]);
+        printf("val: %s\n", val);
+        printf("%s: %s \n", tokens[i], val);
         
         if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
         else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;
@@ -224,7 +214,7 @@ data_container* filter_course_number(post_request* pr, data_container* data){
     for(int i = 0; i < data->length; i++){
         char* check = strstr(courses[i]->course_id, pr->filter_parameters);
         if(check != NULL){
-            printf("found : %s", courses[i]->course_id);
+            printf("found : %s\n", courses[i]->course_id);
             al_add(course_indices, i); 
         }
     }
@@ -234,11 +224,11 @@ data_container* filter_course_number(post_request* pr, data_container* data){
 
 
 data_container* choose_filter(data_container* data, post_request* pr){
-    if (pr->filter_field == NULL || pr->filter_parameters == NULL) return NULL;
+    if (pr->filter_field == NULL || pr->filter_parameters == NULL) return data;
     char* field = pr->filter_field; // field for filtering
     
-    printf("at filter \n");
-    // filter by course number 
+//    printf("at filter \n");
+    // filter by course number
     if(strcmp(field, "coursenumber") == 0)
         return filter_course_number(pr, data);
     // filter by instructor 
@@ -247,7 +237,7 @@ data_container* choose_filter(data_container* data, post_request* pr){
     // filter by enrollment
     if(strcmp(field, "enrollment") == 0)
         return filter_enrollment(pr, data); 
-    return NULL; 
+    return data;
 }
 
 

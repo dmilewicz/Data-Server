@@ -110,26 +110,30 @@ int start_server(int PORT_NUMBER)
             parsed_request* pr = parse_request(request);
             
             
-            post_request* post_req = malloc(sizeof(post_request));
-            if(post_req == NULL) return 0; 
+            
 
-            data_container* pd = NULL;  
+            
             
             print_request(*pr);
             if (  isPost(pr)  ) {
 //                pr->postdata = get_variables(pr->rest);
 //                printf("POST data: %s\n", pr->postdata);
+                
+                post_request* post_req = malloc(sizeof(post_request));
+                if(post_req == NULL) return 0;
+                
+                data_container* pd = NULL;
+                
                 parse_post(post_req, pr->rest);
-                
-                
-                // fd
-                
-                
-                
-                
                 int (*comparep) (course_data*, course_data*);
                 
-                comparep = choose_sort(post_req);
+                
+                print_post_request(post_req);
+                
+                
+                
+                
+                
                 
 //                switch(process_sort(post_req)) {
 //                    case 0:
@@ -154,16 +158,34 @@ int start_server(int PORT_NUMBER)
 //                        comparep = NULL;
 //                }
                 
-                if (comparep != NULL)
-                    quicksort_data(data->data, 0, data->length - 1, comparep);
-
+                
+                printf("Choosing filter...");
                 pd = choose_filter(data, post_req);
+                printf("done.\n");
+                
+                printf("Choosing sort...");
+                comparep = choose_sort(post_req);
+                printf("done.\n");
+                
+                if (comparep == NULL) {
+                    printf("comparep is null!\n");
+                }
                 
                 
                 
-                print_post_request(post_req);
+                
+                
+                printf("Evaluating sort...");
+                if (comparep != NULL) {
+                    
+                    printf("sort request detected: sorting...");
+                    quicksort_data(pd->data, 0, data->length - 1, comparep);
+                }
+                printf("done.\n");
+                
+                
 //                pd = post_process(data, post_req);
-                if(pd!=NULL){
+                if(pd != NULL){
                     // print_courses(pd->data,pd->length); 
                     data_to_HTML(pd);
                     // free_data_container(pd); 
