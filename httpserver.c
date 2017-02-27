@@ -18,12 +18,22 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include "readHTML.h"
 #include "parse.h"
 #include "sort.h"
+#include <pthread.h>
 
+int end; // signal to stop the server
 
-
-
-
-
+void* stop(void* arg){
+    char* input = malloc(sizeof(char)*10); 
+    while(end != 1){
+        printf("Enter 'q' to stop program: "); 
+        scanf("%s", input); 
+        // printf("%s\n", input);
+        if(strcmp("q",input) == 0)
+            end = 1;  
+    }
+    free(input);
+    pthread_exit(NULL); 
+} 
 
 int start_server(int PORT_NUMBER)
 {
@@ -66,7 +76,7 @@ int start_server(int PORT_NUMBER)
 //    quicksort_data(data->data, 0, data->length - 1, compare_professors);
     data_to_HTML(data);
     
-    while(1) {
+    while(end != 1) {
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
         if (listen(sock, 10) == -1) {
@@ -186,6 +196,9 @@ int start_server(int PORT_NUMBER)
         // 7. close: close the connection
         close(fd);
         printf("Server closed connection\n");
+
+        // if(end==1)
+        //     break; 
     }
     
     free_data_container(data);
@@ -197,9 +210,6 @@ int start_server(int PORT_NUMBER)
   
     return 0;
 } 
-
-
-
 
 
 int main(int argc, char *argv[])
@@ -215,8 +225,14 @@ int main(int argc, char *argv[])
     printf("\nPlease specify a port number greater than 1024\n");
     exit(-1);
   }
-
+  // create stop thread 
+  pthread_t t;
+  pthread_create(&t, NULL, &stop, NULL); 
+  // start server 
   start_server(port_number);
+  pthread_join(t, NULL);
+
+  return 0; 
 }
 
                    

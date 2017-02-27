@@ -37,9 +37,7 @@ parsed_request* parse_request(char* request_str) {
     
     incoming_request->postdata = NULL;
     
-    return incoming_request;
-    
-        
+    return incoming_request;        
 }
 
 
@@ -71,7 +69,8 @@ char* get_post(char* pr){
 post_request* parse_post(post_request* pr, char* string){
     char* post_string = get_post(string); 
     // printf("%s\n",post_string);
-    char* delim = "&";
+    char* delim = "=";
+    // char* delim = "&";
     char* tokens[3];
     int index = 0;
     char* temp = strtok(post_string, delim);
@@ -160,12 +159,6 @@ data_container* array_to_data(void* list, course_data** courses){
 
     return data_filtered; 
 }
-
-
-
-
-
-
 
 
 int copy_data(course_data* src, course_data* dest) {
@@ -361,6 +354,7 @@ void* choose_sort(post_request* pr){
 //        return sort(data,pr);  
 //    return NULL; 
 //}
+
 
 void print_post_request(post_request* pr){
 //    printf("Search string: %s\n", pr->filter_parameter);  
