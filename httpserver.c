@@ -46,9 +46,6 @@ typedef struct threaddata {
 } thread_data;
 
 
-
-
-
 int start_server(int PORT_NUMBER)
 {
 
@@ -212,7 +209,7 @@ void* respond(void* response_data) {
         pd = choose_filter(td->data, post_req);
         printf("done.\n");
         
-        print_data(pd);
+        // print_data(pd);
         
         printf("pd length: %zu\n", pd->length);
         
@@ -232,6 +229,7 @@ void* respond(void* response_data) {
         if (comparep != NULL) {
             
             printf("sort request detected: sorting...");
+            sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
         printf("done.\n");
