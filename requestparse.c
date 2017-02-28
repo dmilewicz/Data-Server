@@ -11,6 +11,7 @@
 #include "parse.h"
 #include "arraylist.h"
 #include "sort.h"
+#include <unistd.h>
 
 parsed_request* parse_request(char* request_str) {
     parsed_request* incoming_request = malloc(sizeof(parsed_request));
@@ -39,9 +40,6 @@ parsed_request* parse_request(char* request_str) {
     
     return incoming_request;        
 }
-
-
-
 
 int isPost(parsed_request* p) {
     return strcmp(p->request_type, "POST") == 0;
@@ -224,7 +222,61 @@ data_container* filter_course_number(post_request* pr, data_container* data){
     return array_to_data(course_indices, courses);
 }
 
+data_container* filter_course_quality(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
 
+    // check to see if enrollment number matches 
+    double request = strtod(pr->filter_parameters, NULL);
+    for(int i = 0; i < data->length; i++){
+        if(request <= courses[i]->quality){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses); 
+}
+
+data_container* filter_course_quality_low(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // check to see if enrollment number matches 
+    double request = strtod(pr->filter_parameters, NULL);
+    for(int i = 0; i < data->length; i++){
+        if(request >= courses[i]->quality){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses); 
+}
+
+data_container* filter_course_difficulty(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // check to see if enrollment number matches 
+    double request = strtod(pr->filter_parameters, NULL);
+    for(int i = 0; i < data->length; i++){
+        if(request <= courses[i]->difficulty){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses); 
+}
+
+data_container* filter_course_difficulty_low(post_request* pr, data_container* data){
+    course_data** courses = data->data; // courses 
+    arraylist* course_indices = al_initialize(2); // array list of course indices 
+
+    // check to see if enrollment number matches 
+    double request = strtod(pr->filter_parameters, NULL);
+    for(int i = 0; i < data->length; i++){
+        if(request >= courses[i]->difficulty){
+            al_add(course_indices, i); 
+        }
+    }
+    return array_to_data(course_indices, courses); 
+}
 
 data_container* choose_filter(data_container* data, post_request* pr){
     if (pr->filter_field == NULL || pr->filter_parameters == NULL) return data;
@@ -241,13 +293,24 @@ data_container* choose_filter(data_container* data, post_request* pr){
     if (strcmp(field, "enrollment") == 0)
         return filter_enrollment(pr, data);
     if (strcmp(field, "coursequalityhigh") == 0) {
-        printf("TODO: implement coursequalityhigh\n");
-        return data;
+        // printf("TODO: implement coursequalityhigh\n");
+        return filter_course_quality(pr, data);
     }
+    if (strcmp(field, "coursequalitylow") == 0) {
+        // printf("TODO: implement coursequalityhigh\n");
+        return filter_course_quality_low(pr, data);
+    }
+
     if (strcmp(field, "coursedifficultyhigh") == 0) {
-        printf("TODO: implement coursedifficultyhigh\n");
-        return data;
+        // printf("TODO: implement coursedifficultyhigh\n");
+        return filter_course_difficulty(pr, data);
     }
+
+    if (strcmp(field, "coursedifficultylow") == 0) {
+        // printf("TODO: implement coursedifficultyhigh\n");
+        return filter_course_difficulty_low(pr, data);
+    }
+
     return data;
 }
 
