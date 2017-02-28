@@ -104,7 +104,7 @@ int compare_difficulty_high(course_data* a, course_data* b) {
 }
 
 int compare_instructor_quality(course_data* a, course_data* b) {
-    return a->instructor_quality - b->instructor_quality;
+    return (a->instructor_quality * 100) - (100 * b->instructor_quality);
 }
 
 int compare_quality_high(course_data* a, course_data* b) {
@@ -112,7 +112,7 @@ int compare_quality_high(course_data* a, course_data* b) {
 }
 
 int compare_difficulty_low(course_data* a, course_data* b) {
-    return b->difficulty - a->difficulty;
+    return (100 * b->difficulty) - (100 * a->difficulty);
 }
 
 /*

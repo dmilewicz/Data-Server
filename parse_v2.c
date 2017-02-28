@@ -246,6 +246,10 @@ void data_to_HTML(data_container* data , char* data_target) {
     
 }
 
+void write_averages(data_container* my_data, char* filename) {
+    
+}
+
 
 
 

@@ -36,3 +36,7 @@ double average_difficulty(data_container* d);
 double average_quality(data_container* d);
 double average_instructor_quality(data_container* d);
 
+
+
+
+
