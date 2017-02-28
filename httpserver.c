@@ -19,10 +19,7 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include "parse.h"
 #include "sort.h"
 #include <pthread.h>
-#include <apr_queue.h>
-#include "apu.h"
-#include "apr_errno.h"
-#include "apr_pools.h"
+
 
 
 void* respond(void* response_data);
@@ -248,6 +245,7 @@ void* respond(void* response_data) {
         
     } else {
         strcpy(filename,"data.html");
+        printf("%s\n", filename);
     }
     
     
