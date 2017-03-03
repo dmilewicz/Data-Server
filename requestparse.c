@@ -329,7 +329,10 @@ data_container* copy_data(data_container* d) {
     return new_container;
 }
 
-
+void free_data_shallow(data_container* d) {
+    free(d->data);
+    free(d);
+}
 
 
 

@@ -48,7 +48,7 @@ int blocking_queue_create(size_t q_size) {
     Q->cur_size = Q->head = Q->tail = 0;
     
 
-    pthread_mutex_init(, );
+//    pthread_mutex_init(, );
     
     
     
@@ -58,7 +58,7 @@ int blocking_queue_create(size_t q_size) {
     
 //    blocking_queue* q = calloc(1, sizeof(blocking_queue));
 //    q->entries = malloc(sizeof(blocking_queue*) * QUEUE_SIZE);
-    
+    return 0;
 }
 
 

@@ -86,6 +86,10 @@ int start_server(int PORT_NUMBER)
     
     unsigned int request_count = 0;
     
+    pthread_t threads[10];
+    
+    
+    
     
     data_to_HTML(data, "data.html");
     
@@ -116,12 +120,16 @@ int start_server(int PORT_NUMBER)
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-            pthread_t* t1 = malloc(sizeof(pthread_t));
+//            pthread_t* t1 = malloc(sizeof(pthread_t));
+            void* r;
+            
+            
+            pthread_join(threads[request_count % 10], r);
             
             printf("creating thread");
-            pthread_create(t1, NULL, respond, pass_data);
+            pthread_create(&threads[request_count % 10], NULL, respond, pass_data);
         
-            
+            request_count++;
             
         }
         // 7. close: close the connection
@@ -130,6 +138,8 @@ int start_server(int PORT_NUMBER)
 
 
     }
+    void* r = NULL;
+    for (int i = 0; i < 10; i++) pthread_join(threads[i], r);
     
     free_data_container(data);
     
@@ -200,7 +210,7 @@ void* respond(void* response_data) {
         
         
         parse_post(post_req, pr->rest);
-        int (*comparep) (course_data*, course_data*);
+        int (*comparep) (course_data*, course_data*) = compare_course_id;
         
         
         print_post_request(post_req);
@@ -228,9 +238,8 @@ void* respond(void* response_data) {
         
         printf("Evaluating sort...");
         if (comparep != NULL) {
-            
+            sleep(30);
             printf("sort request detected: sorting...");
-            sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
         printf("done.\n");
@@ -263,7 +272,7 @@ void* respond(void* response_data) {
     send(td->fd, data, strlen(data), 0);
     send(td->fd, td->footer, strlen(td->footer), 0);
     
-    
+    free_data_shallow(td->data);
     
 //    unlink(filename);
     close(td->fd);
