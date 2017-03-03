@@ -203,7 +203,7 @@ void* respond(void* response_data) {
         
         // printf("Evaluating sort...");
         if (comparep != NULL) {
-            // sleep(30);
+            sleep(30);
             printf("sort request detected: sorting...");
             // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
