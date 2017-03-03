@@ -56,5 +56,6 @@ data_container* filter_course_difficulty_low(post_request* pr, data_container* d
 void init_post_request(post_request* pr);
 int process_sort(post_request* pr, int (*comparep) (course_data*, course_data*));
 void* choose_sort(post_request* pr);
+void free_pd(data_container* d);
 
 
