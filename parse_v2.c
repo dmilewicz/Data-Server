@@ -316,3 +316,10 @@ void free_data_container(data_container* d) {
 }
 
 
+
+
+void free_data_shallow(data_container* d) {
+    free(d->data);
+    free(d);
+}
+

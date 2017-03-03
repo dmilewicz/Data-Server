@@ -91,31 +91,9 @@ post_request* parse_post(post_request* pr, char* string){
 }
 
 
-    // store search filter string and field type 
-//    if(tokens[0]!=NULL){
-//        char* check = strstr(tokens[0], "&"); 
-//        // printf("%s\n", check);
-//        if(check != NULL){
-//            pr->filter_parameter = strtok(tokens[0],"&"); 
-//            // handle sort case 
-//            if(strcmp(pr->filter_parameter, "sortfield") == 0){
-//                pr->field_type = pr->filter_parameter; 
-//                pr->filter_parameter = NULL; 
-//            }
-//            else
-//                pr->field_type = strtok(NULL, "&"); 
-//            pr->field = tokens[1];
-//        }
-//        else{
-//            pr->filter_parameter = tokens[0];
-//        }
-//    }
 
 
 void init_post_request(post_request* pr) {
-//    pr->field = NULL;
-//    pr->field_type = NULL;
-//    pr->filter_parameter = NULL;
     pr->filter_parameters = NULL;
     pr->filter_field = NULL;
     pr->sort_field = NULL;
@@ -152,21 +130,6 @@ data_container* array_to_data(void* list, course_data** courses){
 }
 
 
-//int copy_data(course_data* src, course_data* dest) {
-//    
-//    dest->course_info = malloc(sizeof(char)* (strlen(src->course_info) + 1));
-//    if (dest->course_info == NULL) return -1;
-//    
-//    strcpy(dest->course_info, src->course_info);
-//    strcpy(dest->course_id, src->course_id);
-//    strcpy(dest->prof, src->prof);
-//    dest->enrollment = src->enrollment;
-//    dest->quality = src->quality;
-//    dest->difficulty = src->difficulty;
-//    dest->instructor_quality = src->instructor_quality;
-//    
-//    return 0;
-//}
 
 
 data_container* filter_enrollment(post_request* pr, data_container* data){
@@ -282,7 +245,6 @@ data_container* choose_filter(data_container* data, post_request* pr){
     if (pr->filter_field == NULL || pr->filter_parameters == NULL) return data;
     char* field = pr->filter_field; // field for filtering
     
-//    printf("at filter \n");
     // filter by course number
     if (strcmp(field, "coursenumber") == 0)
         return filter_course_number(pr, data);
@@ -329,11 +291,125 @@ data_container* copy_data(data_container* d) {
     return new_container;
 }
 
-void free_data_shallow(data_container* d) {
-    free(d->data);
-    free(d);
+
+
+
+
+
+
+void* choose_sort(post_request* pr){
+    if (pr->sort_field == NULL) return NULL;
+    
+    // filter by course number
+    if(strcmp(pr->sort_field, "coursenumber") == 0)
+        return compare_course_id;
+    // filter by instructor
+    if(strcmp(pr->sort_field, "instructorname") == 0)
+        return compare_professors;
+    // filter by enrollment
+    if(strcmp(pr->sort_field, "enrollment") == 0)
+        return compare_enrollment;
+    // sort by course quality high
+    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
+        return compare_quality_high;
+    // sort by course quality low
+    if(strcmp(pr->sort_field, "coursequalitylow") == 0)
+        return compare_quality_low;
+    // sort by course difficulty high
+    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
+        return compare_difficulty_high;
+    // sort by course difficulty low
+    if(strcmp(pr->sort_field, "coursedifficultylow") == 0)
+        return compare_difficulty_low;
+    return NULL;
 }
 
+
+
+
+
+
+
+void print_post_request(post_request* pr){
+    printf("sort_field: %s\n", pr->sort_field);
+    printf("filter_field: %s\n", pr->filter_field);
+    printf("filter_parameters: %s\n\n", pr->filter_parameters);
+}
+
+void print_request(parsed_request pr) {
+    printf("Request Type: %s\n", pr.request_type);
+    printf("Requested resource: %s\n", pr.resource);
+    printf("HTTP Version: %s\n", pr.HTTP_version);
+    printf("Host: %s\n", pr.host);
+    printf("Rest:\n%s\n\n", pr.rest);
+}
+
+
+
+
+
+//int copy_data(course_data* src, course_data* dest) {
+//    
+//    dest->course_info = malloc(sizeof(char)* (strlen(src->course_info) + 1));
+//    if (dest->course_info == NULL) return -1;
+//    
+//    strcpy(dest->course_info, src->course_info);
+//    strcpy(dest->course_id, src->course_id);
+//    strcpy(dest->prof, src->prof);
+//    dest->enrollment = src->enrollment;
+//    dest->quality = src->quality;
+//    dest->difficulty = src->difficulty;
+//    dest->instructor_quality = src->instructor_quality;
+//    
+//    return 0;
+//}
+
+  
+
+// store search filter string and field type
+//    if(tokens[0]!=NULL){
+//        char* check = strstr(tokens[0], "&"); 
+//        // printf("%s\n", check);
+//        if(check != NULL){
+//            pr->filter_parameter = strtok(tokens[0],"&"); 
+//            // handle sort case 
+//            if(strcmp(pr->filter_parameter, "sortfield") == 0){
+//                pr->field_type = pr->filter_parameter; 
+//                pr->filter_parameter = NULL; 
+//            }
+//            else
+//                pr->field_type = strtok(NULL, "&"); 
+//            pr->field = tokens[1];
+//        }
+//        else{
+//            pr->filter_parameter = tokens[0];
+//        }
+//    }
+
+//int process_sort(post_request* pr, int (*comparep) (course_data*, course_data*)){
+//    // filter by course number
+//    if(strcmp(pr->sort_field, "coursenumber") == 0)
+//        comparep = compare_course_id;
+//        return 0;
+//    // filter by instructor
+//    if(strcmp(pr->sort_field, "instructorname") == 0)
+//        comparep = compare_professors;
+//        return 1;
+//    // filter by enrollment
+//    if(strcmp(pr->sort_field, "enrollment") == 0)
+//        comparep = compare_enrollment;
+//        return 2;
+//    // sort by course quality
+//    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
+//        comparep = compare_quality;
+//        return 3;
+//    // sort by course difficulty
+//    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
+//        comparep = compare_difficulty;
+//        return 4;
+//    comparep = NULL;
+//    return -1;
+//}
 
 
 //data_container* sort(data_container* data, post_request* pr){
@@ -371,66 +447,7 @@ void free_data_shallow(data_container* d) {
 //    return NULL; 
 //}
 
-
-
-
-//int process_sort(post_request* pr, int (*comparep) (course_data*, course_data*)){
-//    // filter by course number
-//    if(strcmp(pr->sort_field, "coursenumber") == 0)
-//        comparep = compare_course_id;
-//        return 0;
-//    // filter by instructor
-//    if(strcmp(pr->sort_field, "instructorname") == 0)
-//        comparep = compare_professors;
-//        return 1;
-//    // filter by enrollment
-//    if(strcmp(pr->sort_field, "enrollment") == 0)
-//        comparep = compare_enrollment;
-//        return 2;
-//    // sort by course quality
-//    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
-//        comparep = compare_quality;
-//        return 3;
-//    // sort by course difficulty
-//    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
-//        comparep = compare_difficulty;
-//        return 4;
-//    comparep = NULL;
-//    return -1;
-//}
-
-
-
-void* choose_sort(post_request* pr){
-    if (pr->sort_field == NULL) return NULL;
-    
-    // filter by course number
-    if(strcmp(pr->sort_field, "coursenumber") == 0)
-        return compare_course_id;
-    // filter by instructor
-    if(strcmp(pr->sort_field, "instructorname") == 0)
-        return compare_professors;
-    // filter by enrollment
-    if(strcmp(pr->sort_field, "enrollment") == 0)
-        return compare_enrollment;
-    // sort by course quality high
-    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
-        return compare_quality_high;
-    // sort by course quality low
-    if(strcmp(pr->sort_field, "coursequalitylow") == 0)
-        return compare_quality_low;
-    // sort by course difficulty high
-    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
-        return compare_difficulty_high;
-    // sort by course difficulty low
-    if(strcmp(pr->sort_field, "coursedifficultylow") == 0)
-        return compare_difficulty_low;
-    return NULL;
-}
-
-
-
-
+  
 //data_container* post_process(data_container* data, post_request* pr){
 //    // Edge case: check if field type is not NULL
 //    if(pr->field_type == NULL){
@@ -444,33 +461,3 @@ void* choose_sort(post_request* pr){
 //        return sort(data,pr);  
 //    return NULL; 
 //}
-
-
-void print_post_request(post_request* pr){
-//    printf("Search string: %s\n", pr->filter_parameter);  
-//    printf("Field type: %s\n", pr->field_type);
-//    printf("Field: %s\n", pr->field);
-    printf("sort_field: %s\n", pr->sort_field);
-    printf("filter_field: %s\n", pr->filter_field);
-    printf("filter_parameters: %s\n\n", pr->filter_parameters);
-}
-
-void print_request(parsed_request pr) {
-    printf("Request Type: %s\n", pr.request_type);
-    printf("Requested resource: %s\n", pr.resource);
-    printf("HTTP Version: %s\n", pr.HTTP_version);
-    printf("Host: %s\n", pr.host);
-    printf("Rest:\n%s\n\n", pr.rest);
-}
-
- void free(){
-
- }
-
-
-
-
-  
-
-  
-

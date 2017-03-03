@@ -85,11 +85,9 @@ int start_server(int PORT_NUMBER)
     char* footer = "</body></html>";
     
     unsigned int request_count = 0;
+    size_t num_threads = 100;
     
-    pthread_t threads[10];
-    
-    
-    
+    pthread_t threads[num_threads];
     
     data_to_HTML(data, "data.html");
     
@@ -120,14 +118,11 @@ int start_server(int PORT_NUMBER)
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-//            pthread_t* t1 = malloc(sizeof(pthread_t));
-            void* r;
-            
-            
-            pthread_join(threads[request_count % 10], r);
+            //
+            pthread_join(threads[request_count % num_threads], NULL);
             
             printf("creating thread");
-            pthread_create(&threads[request_count % 10], NULL, respond, pass_data);
+            pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
         
             request_count++;
             
@@ -138,11 +133,11 @@ int start_server(int PORT_NUMBER)
 
 
     }
-    void* r = NULL;
-    for (int i = 0; i < 10; i++) pthread_join(threads[i], r);
+    // join
+    for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
     
+    // free the data container
     free_data_container(data);
-    
     
     // 8. close: close the socket
     close(sock);
@@ -217,10 +212,6 @@ void* respond(void* response_data) {
         // printf("Choosing sort...");
         comparep = choose_sort(post_req);
         // printf("done.\n");
-        
-        if (comparep == NULL) {
-            // printf("comparep is null!\n");
-        }
         
         // printf("Evaluating sort...");
         if (comparep != NULL) {
