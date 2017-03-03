@@ -41,19 +41,11 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     int i = p+1, j = r;
     
     while( i <= j) {
-        
-        // printing functions used for debugging
-//        printf("%d\n", p);
-//        printf("i: %d, j: %d\n", i,j);
-//        printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
-        
+
         
         while(i <= j && compare(data[i], pivot) <= 0) {
             i++;
-//            printf("i: %d\n", i);
-        // printf("%d\n", p);
-        // printf("i: %d, j: %d\n", i,j);
-        // printf("ii: %d, jj: %d\n", data[i]->enrollment, data[j]->enrollment);
+
 
         }
         while(i <= j && compare(data[j], pivot) > 0) j--;

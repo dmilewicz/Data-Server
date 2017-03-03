@@ -66,7 +66,6 @@ post_request* parse_post(post_request* pr, char* string){
     while(temp != NULL){
         
         tokens[index] = temp;
-//        printf("keyval %d: %s\n", index, tokens[index]);
         index++;
         temp = strtok(NULL, delim);
     }
@@ -78,9 +77,6 @@ post_request* parse_post(post_request* pr, char* string){
     for (int i = 0; i < index; i++) {
         val = strtok(tokens[i], "=");
         val = strtok(NULL, "=");
-//        printf("tokens[%d]: %s\n", i, tokens[i]);
-//        printf("val: %s\n", val);
-//        printf("%s: %s \n", tokens[i], val);
         
         if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
         else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;

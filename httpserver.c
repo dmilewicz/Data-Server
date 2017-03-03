@@ -122,14 +122,14 @@ int start_server(int PORT_NUMBER)
             pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
             
             request_count++;
-            sleep(1);
-            close(fd);
+//            sleep(1);
+//            close(fd);
         }
         // 7. close: close the connection
         printf("Server closed connection\n"); 
     }
     // join
-//    for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
+    for (int i = 0; i < (request_count % num_threads) ; i++) pthread_join(threads[i], NULL);
     
     // free the data container
     free_data_container(data);
@@ -137,6 +137,7 @@ int start_server(int PORT_NUMBER)
     // 8. close: close the socket
     close(sock);
     printf("Server shutting down\n");
+    unlink("data.html");
   
     return 0;
 } 
@@ -204,7 +205,7 @@ void* respond(void* response_data) {
         
         // printf("Evaluating sort...");
         if (comparep != NULL) {
-            sleep(30);
+//            sleep(30);
             printf("sort request detected: sorting...");
             // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
@@ -237,51 +238,18 @@ void* respond(void* response_data) {
     send(td->fd, data, strlen(data), 0);
     send(td->fd, td->footer, strlen(td->footer), 0);
     
-    // free parsed request 
-//    free(pr); 
 
     if (isPost(pr)) {
         unlink(filename);
     }
+    
+    free(pr);
     printf("%s\n", filename);
-//    close(td->fd);
+    close(td->fd);
     
     pthread_exit(NULL);
     return NULL;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
