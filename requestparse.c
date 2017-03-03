@@ -90,7 +90,6 @@ post_request* parse_post(post_request* pr, char* string){
     return pr;
 }
 
-
 void init_post_request(post_request* pr) {
     pr->filter_parameters = NULL;
     pr->filter_field = NULL;
@@ -117,6 +116,7 @@ data_container* array_to_data(void* list, course_data** courses){
     al_free(course_indices);
     return data_filtered; 
 }
+
 
 data_container* filter_enrollment(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
@@ -276,73 +276,6 @@ void free_shallow_data(data_container* d) {
     free(d);
 }
 
-
-
-//data_container* sort(data_container* data, post_request* pr){
-//    course_data** courses = data->data; // courses
-//    // sort by course number 
-//    if(strcmp(pr->field, "coursenumber") == 0){
-//        // sort by course id
-//        quicksort_data(courses, 0, data->length - 1, compare_course_id);
-//        return data;
-//    }
-//    // sort by instructor 
-//    if(strcmp(pr->field, "instructorname") == 0){
-//        // sort by instructors
-//        quicksort_data(courses, 0, data->length - 1, compare_professors);
-//        return data; 
-//    }
-//    // sort by enrollment
-//    if(strcmp(pr->field, "enrollment") == 0){
-//        // sort by enrollment
-//        quicksort_data(courses, 0, data->length - 1, compare_enrollment);
-//        return data; 
-//    }
-//    // sort by course quality 
-//    if(strcmp(pr->field, "coursequalityhigh") == 0){
-//        // sort by course quality 
-//         quicksort_data(courses, 0, data->length - 1, compare_quality);
-//        return data;
-//    }
-//    // sort by course difficulty 
-//    if(strcmp(pr->field, "coursedifficultyhigh") == 0){
-//        // sort by course difficulty 
-//        quicksort_data(courses, 0, data->length - 1, compare_difficulty);
-//        return data; 
-//    }
-//    return NULL; 
-//}
-
-
-
-
-//int process_sort(post_request* pr, int (*comparep) (course_data*, course_data*)){
-//    // filter by course number
-//    if(strcmp(pr->sort_field, "coursenumber") == 0)
-//        comparep = compare_course_id;
-//        return 0;
-//    // filter by instructor
-//    if(strcmp(pr->sort_field, "instructorname") == 0)
-//        comparep = compare_professors;
-//        return 1;
-//    // filter by enrollment
-//    if(strcmp(pr->sort_field, "enrollment") == 0)
-//        comparep = compare_enrollment;
-//        return 2;
-//    // sort by course quality
-//    if(strcmp(pr->sort_field, "coursequalityhigh") == 0)
-//        comparep = compare_quality;
-//        return 3;
-//    // sort by course difficulty
-//    if(strcmp(pr->sort_field, "coursedifficultyhigh") == 0)
-//        comparep = compare_difficulty;
-//        return 4;
-//    comparep = NULL;
-//    return -1;
-//}
-
-
-
 void* choose_sort(post_request* pr){
     if (pr->sort_field == NULL) return NULL;
     
@@ -370,24 +303,6 @@ void* choose_sort(post_request* pr){
     return NULL;
 }
 
-
-
-
-//data_container* post_process(data_container* data, post_request* pr){
-//    // Edge case: check if field type is not NULL
-//    if(pr->field_type == NULL){
-//        return NULL;
-//    }
-//    // filter data 
-//    if(strcmp(pr->field_type, "searchfield")==0) 
-//        return choose_filter(data, pr);
-//    // sort data
-//    if(strcmp(pr->field_type, "sortfield")==0)
-//        return sort(data,pr);  
-//    return NULL; 
-//}
-
-
 void print_post_request(post_request* pr){
     printf("sort_field: %s\n", pr->sort_field);
     printf("filter_field: %s\n", pr->filter_field);
@@ -401,18 +316,4 @@ void print_request(parsed_request pr) {
     printf("Host: %s\n", pr.host);
     printf("Rest:\n%s\n\n", pr.rest);
 }
-
- // void free_pd(data_container* d){
- //    // free courses 
- //    free(d->data);
- //    // free container
- //    free(d);
- // }
-
-
-
-
-  
-
-  
 

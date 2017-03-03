@@ -10,11 +10,11 @@
 #define sort_h
 
 #include <stdio.h>
-#include <strings.h>
 
 #endif /* sort_h */
 
 #include "parse.h"
+#include <strings.h>
 
 
 void swap(course_data** arr, int a, int b);
