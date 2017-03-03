@@ -269,17 +269,17 @@ void data_to_HTML(data_container* data , char* data_target) {
         fputs(closed_data_tag, data_file);
         
         fputs(open_data_tag, data_file);
-        sprintf(buf, "%f", data->data[i]->quality);
+        sprintf(buf, "%.2f", data->data[i]->quality);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file);
         
         fputs(open_data_tag, data_file);
-        sprintf(buf, "%f", data->data[i]->difficulty);
+        sprintf(buf, "%.2f", data->data[i]->difficulty);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file);
         
         fputs(open_data_tag, data_file);
-        sprintf(buf, "%f", data->data[i]->instructor_quality);
+        sprintf(buf, "%.2f", data->data[i]->instructor_quality);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file);
         

@@ -146,6 +146,12 @@ data_container* filter_instructor(post_request* pr, data_container* data){
         }
     }
 
+    for (int j = 0; j < strlen(pr->filter_parameters); j++) {
+        pr->filter_parameters[j] = toupper(pr->filter_parameters[j]);
+    }
+    
+    printf("%s\n", pr->filter_parameters);
+    
     // store course indices of matched strings 
     for(int i = 0; i < data->length; i++){
         check = strstr(courses[i]->prof, pr->filter_parameters);
