@@ -14,6 +14,7 @@
 #include <string.h>
 #include "readHTML.h"
 #include "parse.h"
+#include "sort.h"
 
 void print_courses(course_data** courses, int size){
 	for(int i = 0; i < size; i++){
@@ -173,17 +174,72 @@ data_container* parse_data(char* filename){
 }
 
 
+void write_averages(data_container* my_data, FILE* data_file) {
+    // store header 
+    char* header = "<table border='1'>\n<tr>\n<th>Total Courses</th>\n<th>Avg. Enrollment</th>\n<th>Avg. Course Quality</th>\n<th>Avg. Course Difficulty</th>\n<th>Avg. Instructor Quality</th>\n";
+    // write header to file 
+    fputs(header, data_file);
 
+    // initialize open and close row/data tags
+    char* open_row_tag = "<tr>\n";
+    char* closed_row_tag = "</tr>\n";
+            
+    // define data tag
+    char* open_data_tag = "<td> ";
+    char* closed_data_tag = "</td>\n";
+
+    if(my_data->length > 0){
+      int avg_enrollment = average_enrollment(my_data);
+      double avg_quality = average_quality(my_data);
+      double avg_difficulty = average_difficulty(my_data);
+      double avg_prof_quality = average_instructor_quality(my_data); 
+
+      char buf[15];
+
+        // start new row of data
+        fputs(open_row_tag, data_file);
+
+        printf("%zu\n", my_data->length);
+
+        fputs(open_data_tag, data_file);
+        sprintf(buf, "%zu", my_data->length);
+        fputs(buf, data_file);
+        fputs(closed_data_tag, data_file);
+
+        fputs(open_data_tag, data_file);
+        sprintf(buf, "%d", avg_enrollment);
+        fputs(buf, data_file);
+        fputs(closed_data_tag, data_file);
+        
+        fputs(open_data_tag, data_file);
+        sprintf(buf, "%f", avg_quality);
+        fputs(buf, data_file);
+        fputs(closed_data_tag, data_file);
+        
+        fputs(open_data_tag, data_file);
+        sprintf(buf, "%f", avg_difficulty);
+        fputs(buf, data_file);
+        fputs(closed_data_tag, data_file);
+        
+        fputs(open_data_tag, data_file);
+        sprintf(buf, "%f", avg_prof_quality);
+        fputs(buf, data_file);
+        fputs(closed_data_tag, data_file); 
+    }
+
+    // end row of data
+    fputs(closed_row_tag,data_file);
+
+     // add footer to data.html file
+    char* footer = "</table>";
+    fputs(footer, data_file);
+}
 
 void data_to_HTML(data_container* data , char* data_target) {
     
-    // data file to write to. Could configure it straight into a string but the size will have to be variable (this is simpler).
-    
-    
-    
-    
-    
     FILE* data_file = fopen(data_target,"w");
+
+    write_averages(data, data_file);
      
     // write header to data.html file
     char* header = "<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n";
@@ -193,8 +249,6 @@ void data_to_HTML(data_container* data , char* data_target) {
     // initialize open and close row/data tags
     char* open_row_tag = "<tr>\n";
     char* closed_row_tag = "</tr>\n";
-            
-    // define data tag
     char* open_data_tag = "<td> ";
     char* closed_data_tag = "</td>\n";
         
@@ -236,7 +290,6 @@ void data_to_HTML(data_container* data , char* data_target) {
         fputs(closed_row_tag,data_file);
         
     }
-    
     // add footer to data.html file
     char* footer = "</table>";
     fputs(footer, data_file);
@@ -245,14 +298,6 @@ void data_to_HTML(data_container* data , char* data_target) {
     fclose(data_file);
     
 }
-
-void write_averages(data_container* my_data, char* filename) {
-    
-}
-
-
-
-
 
 void free_data_container(data_container* d) {
     // free data

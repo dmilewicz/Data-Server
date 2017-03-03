@@ -189,85 +189,60 @@ void* respond(void* response_data) {
     data_container* pd;
     char filename[100];
     
-    
-    
     if (  isPost(pr)  ) {
-        //                pr->postdata = get_variables(pr->rest);
-        //                printf("POST data: %s\n", pr->postdata);
-        
         post_request* post_req = malloc(sizeof(post_request));
         if(post_req == NULL) return NULL;
-        
         
         parse_post(post_req, pr->rest);
         int (*comparep) (course_data*, course_data*);
         
-        
-        print_post_request(post_req);
-        
-        
-        printf("Choosing filter...");
+        // print_post_request(post_req);
+         
+        // printf("Choosing filter...");
         pd = choose_filter(td->data, post_req);
-        printf("done.\n");
+        // printf("done.\n");
+    
+        // printf("pd length: %zu\n", pd->length);
         
-        // print_data(pd);
-        
-        printf("pd length: %zu\n", pd->length);
-        
-        printf("Choosing sort...");
+        // printf("Choosing sort...");
         comparep = choose_sort(post_req);
-        printf("done.\n");
+        // printf("done.\n");
         
         if (comparep == NULL) {
-            printf("comparep is null!\n");
+            // printf("comparep is null!\n");
         }
         
-        
-        
-        
-        
-        printf("Evaluating sort...");
+        // printf("Evaluating sort...");
         if (comparep != NULL) {
             
             printf("sort request detected: sorting...");
-            sleep(40);
+            // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
-        printf("done.\n");
-        
+        // printf("done.\n");
         
         sprintf(filename, "data%d.html", td->fd);
-        printf("filename: %s\n", filename);
-        data_to_HTML(pd, filename);
-        
-        
+        // printf("filename: %s\n", filename);
+        data_to_HTML(pd, filename);  
     } else {
         strcpy(filename,"data.html");
         printf("%s\n", filename);
     }
     
-    
     //read in HTML file
     char* resource = readHTML("index.html");
-    
-    
+
     // parse data into structure and format data into html
     char* data = readHTML(filename);
-    
-    //            print file for testing
-    //            printf("%s", resource);
     
     // 6. send: send the outgoing message (response) over the socket
     send(td->fd, td->header, strlen(td->header), 0);
     send(td->fd, resource, strlen(resource), 0);
     send(td->fd, data, strlen(data), 0);
     send(td->fd, td->footer, strlen(td->footer), 0);
-    
-    
-    
+
 //    unlink(filename);
     close(td->fd);
-    
     return &td->fd;
 }
 
