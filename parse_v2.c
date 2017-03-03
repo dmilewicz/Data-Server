@@ -199,8 +199,6 @@ void write_averages(data_container* my_data, FILE* data_file) {
         // start new row of data
         fputs(open_row_tag, data_file);
 
-        printf("%zu\n", my_data->length);
-
         fputs(open_data_tag, data_file);
         sprintf(buf, "%zu", my_data->length);
         fputs(buf, data_file);
@@ -225,11 +223,10 @@ void write_averages(data_container* my_data, FILE* data_file) {
         sprintf(buf, "%f", avg_prof_quality);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file); 
+
+        // end row of data
+        fputs(closed_row_tag,data_file);
     }
-
-    // end row of data
-    fputs(closed_row_tag,data_file);
-
      // add footer to data.html file
     char* footer = "</table>";
     fputs(footer, data_file);

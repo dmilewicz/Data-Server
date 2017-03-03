@@ -128,17 +128,14 @@ int start_server(int PORT_NUMBER)
             
         }
         // 7. close: close the connection
-//        close(fd);
-        printf("Server closed connection\n");
-
-
+        printf("Server closed connection\n"); 
     }
     // join
     for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
     
     // free the data container
     free_data_container(data);
-    
+
     // 8. close: close the socket
     close(sock);
     printf("Server shutting down\n");
@@ -173,21 +170,17 @@ int main(int argc, char *argv[])
 
 
 void* respond(void* response_data) {
-    
-   
     thread_data* td = (thread_data*)response_data;
-    
-    
+
     // buffer to read data into
     char request[1024];
     
     // 5. recv: read incoming message (request) into buffer
     int bytes_received = recv(td->fd,request,1024,0);
+    
     // null-terminate the string
     request[bytes_received] = '\0';
-    // print it to standard out
-    //            printf("This is the incoming request:\n%s\n\n", request);
-    
+
     parsed_request* pr = parse_request(request);
     print_request(*pr);
     
@@ -223,8 +216,12 @@ void* respond(void* response_data) {
         // printf("done.\n");
         
         sprintf(filename, "data%d.html", td->fd);
-        // printf("filename: %s\n", filename);
         data_to_HTML(pd, filename);  
+
+        // free temporary post data container 
+        free_pd(pd);
+        // free post request 
+        free(post_req); 
     } else {
         strcpy(filename,"data.html");
         printf("%s\n", filename);
@@ -244,6 +241,9 @@ void* respond(void* response_data) {
     
     free_data_shallow(td->data);
     
+
+    // free parsed request 
+    free(pr); 
 
 //    unlink(filename);
     close(td->fd);

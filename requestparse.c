@@ -109,27 +109,16 @@ data_container* array_to_data(void* list, course_data** courses){
     int* indices = course_indices->values; 
 
     for(int i = 0; i < course_indices->size; i++){
-
         fc[i] = courses[indices[i]];
-        
-        
-        
-//        fc[i] = malloc(sizeof(course_data));
-//        if (fc[i] == NULL) return NULL; 
-
-//        if (copy_data(courses[*indices + i], fc[i]) != 0) return NULL;
-//        indices++; 
     }
 
     // create new data container for filtered courses 
     data_container* data_filtered = malloc(sizeof(data_container)); 
     data_filtered->length = course_indices->size; 
     data_filtered->data = fc; 
-
+    al_free(course_indices);
     return data_filtered; 
 }
-
-
 
 
 data_container* filter_enrollment(post_request* pr, data_container* data){
@@ -254,25 +243,18 @@ data_container* choose_filter(data_container* data, post_request* pr){
     // filter by enrollment
     if (strcmp(field, "enrollment") == 0)
         return filter_enrollment(pr, data);
-    if (strcmp(field, "coursequalityhigh") == 0) {
-        // printf("TODO: implement coursequalityhigh\n");
+    // filter by course quality above 
+    if (strcmp(field, "coursequalityhigh") == 0) 
         return filter_course_quality(pr, data);
-    }
-    if (strcmp(field, "coursequalitylow") == 0) {
-        // printf("TODO: implement coursequalityhigh\n");
+    // filter by course quality below 
+    if (strcmp(field, "coursequalitylow") == 0)
         return filter_course_quality_low(pr, data);
-    }
-
-    if (strcmp(field, "coursedifficultyhigh") == 0) {
-        // printf("TODO: implement coursedifficultyhigh\n");
+    // filter by course difficulty above 
+    if (strcmp(field, "coursedifficultyhigh") == 0) 
         return filter_course_difficulty(pr, data);
-    }
-
-    if (strcmp(field, "coursedifficultylow") == 0) {
-        // printf("TODO: implement coursedifficultyhigh\n");
+    // filter by course difficulty below
+    if (strcmp(field, "coursedifficultylow") == 0) 
         return filter_course_difficulty_low(pr, data);
-    }
-
     return data;
 }
 
@@ -345,6 +327,13 @@ void print_request(parsed_request pr) {
 }
 
 
+
+void free_pd(data_container* d){
+    // free courses
+    free(d->data);
+    // free container
+    free(d);
+}
 
 
 
