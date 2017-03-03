@@ -94,8 +94,6 @@ int compare_enrollment(course_data* a, course_data* b) {
 }
 
 int compare_quality_low(course_data* a, course_data* b) {
-    printf("dub: %d\n", ((int)(100 * a->quality)) - ((int)(100 * b->quality)));
-//    return a->quality - b->quality;
     return ((100 * a->quality)) - ((100 * b->quality));
 }
 
