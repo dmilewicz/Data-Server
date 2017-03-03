@@ -20,8 +20,6 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include "sort.h"
 #include <pthread.h>
 
-
-
 void* respond(void* response_data);
 int end; // signal to stop the server
 
@@ -88,9 +86,6 @@ int start_server(int PORT_NUMBER)
     
     pthread_t threads[10];
     
-    
-    
-    
     data_to_HTML(data, "data.html");
     
     while(end != 1) {
@@ -119,11 +114,8 @@ int start_server(int PORT_NUMBER)
             pass_data->footer = footer;
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
-            
-//            pthread_t* t1 = malloc(sizeof(pthread_t));
-            void* r;
-            
-            
+            void* r = NULL;
+             
             pthread_join(threads[request_count % 10], r);
             
             printf("creating thread");
@@ -171,8 +163,6 @@ int main(int argc, char *argv[])
   return 0; 
 }
 
-
-
 void* respond(void* response_data) {
     thread_data* td = (thread_data*)response_data;
 
@@ -216,7 +206,7 @@ void* respond(void* response_data) {
         
         // printf("Evaluating sort...");
         if (comparep != NULL) {
-            sleep(30);
+            // sleep(30);
             printf("sort request detected: sorting...");
             // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
@@ -227,7 +217,7 @@ void* respond(void* response_data) {
         data_to_HTML(pd, filename);  
 
         // free temporary post data container 
-        free_pd(pd);
+        free_shallow_data(pd);
         // free post request 
         free(post_req); 
     } else {
@@ -247,9 +237,6 @@ void* respond(void* response_data) {
     send(td->fd, data, strlen(data), 0);
     send(td->fd, td->footer, strlen(td->footer), 0);
     
-    free_data_shallow(td->data);
-    
-
     // free parsed request 
     free(pr); 
 

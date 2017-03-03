@@ -91,31 +91,7 @@ post_request* parse_post(post_request* pr, char* string){
 }
 
 
-    // store search filter string and field type 
-//    if(tokens[0]!=NULL){
-//        char* check = strstr(tokens[0], "&"); 
-//        // printf("%s\n", check);
-//        if(check != NULL){
-//            pr->filter_parameter = strtok(tokens[0],"&"); 
-//            // handle sort case 
-//            if(strcmp(pr->filter_parameter, "sortfield") == 0){
-//                pr->field_type = pr->filter_parameter; 
-//                pr->filter_parameter = NULL; 
-//            }
-//            else
-//                pr->field_type = strtok(NULL, "&"); 
-//            pr->field = tokens[1];
-//        }
-//        else{
-//            pr->filter_parameter = tokens[0];
-//        }
-//    }
-
-
 void init_post_request(post_request* pr) {
-//    pr->field = NULL;
-//    pr->field_type = NULL;
-//    pr->filter_parameter = NULL;
     pr->filter_parameters = NULL;
     pr->filter_field = NULL;
     pr->sort_field = NULL;
@@ -188,7 +164,6 @@ data_container* filter_course_number(post_request* pr, data_container* data){
     for(int i = 0; i < data->length; i++){
         char* check = strstr(courses[i]->course_id, pr->filter_parameters);
         if(check != NULL){
-            printf("found : %s\n", courses[i]->course_id);
             al_add(course_indices, i); 
         }
     }
@@ -294,8 +269,10 @@ data_container* copy_data(data_container* d) {
     return new_container;
 }
 
-void free_data_shallow(data_container* d) {
+void free_shallow_data(data_container* d) {
+    // free course data
     free(d->data);
+    // free container 
     free(d);
 }
 
@@ -412,9 +389,6 @@ void* choose_sort(post_request* pr){
 
 
 void print_post_request(post_request* pr){
-//    printf("Search string: %s\n", pr->filter_parameter);  
-//    printf("Field type: %s\n", pr->field_type);
-//    printf("Field: %s\n", pr->field);
     printf("sort_field: %s\n", pr->sort_field);
     printf("filter_field: %s\n", pr->filter_field);
     printf("filter_parameters: %s\n\n", pr->filter_parameters);
@@ -428,12 +402,12 @@ void print_request(parsed_request pr) {
     printf("Rest:\n%s\n\n", pr.rest);
 }
 
- void free_pd(data_container* d){
-    // free courses 
-    free(d->data);
-    // free container
-    free(d);
- }
+ // void free_pd(data_container* d){
+ //    // free courses 
+ //    free(d->data);
+ //    // free container
+ //    free(d);
+ // }
 
 
 
