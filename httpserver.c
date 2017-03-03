@@ -237,9 +237,12 @@ void* respond(void* response_data) {
     // free parsed request 
     free(pr); 
 
-//    unlink(filename);
+    if (isPost(pr)) {
+        unlink(filename);
+    }
+//    
     close(td->fd);
-    return &td->fd;
+    return NULL;
 }
 
 
