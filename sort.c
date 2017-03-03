@@ -7,6 +7,7 @@
 //
 
 #include "sort.h"
+#include <string.h>
 
 
 

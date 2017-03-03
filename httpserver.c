@@ -21,7 +21,7 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include <pthread.h>
 
 void* respond(void* response_data);
-int end; // signal to stop the server
+int end = 0; // signal to stop the server
 
 void* stop(void* arg){
     char* input = malloc(sizeof(char)*10); 
@@ -116,7 +116,7 @@ int start_server(int PORT_NUMBER)
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-            pthread_join(threads[request_count % num_threads], NULL);
+           // pthread_join(threads[request_count % num_threads], NULL);
             
             printf("creating thread");
             pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
@@ -128,7 +128,7 @@ int start_server(int PORT_NUMBER)
         printf("Server closed connection\n"); 
     }
     // join
-    for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
+    //for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
     
     // free the data container
     free_data_container(data);
@@ -203,7 +203,7 @@ void* respond(void* response_data) {
         
         // printf("Evaluating sort...");
         if (comparep != NULL) {
-            // sleep(30);
+            sleep(30);
             printf("sort request detected: sorting...");
             // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
