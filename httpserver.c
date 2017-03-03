@@ -116,19 +116,20 @@ int start_server(int PORT_NUMBER)
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-           // pthread_join(threads[request_count % num_threads], NULL);
+            if (request_count > num_threads) pthread_join(threads[request_count % num_threads], NULL);
             
-            printf("creating thread");
+            printf("creating thread\n");
             pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
-        
-            request_count++;
             
+            request_count++;
+            sleep(1);
+            close(fd);
         }
         // 7. close: close the connection
         printf("Server closed connection\n"); 
     }
     // join
-    //for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
+//    for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
     
     // free the data container
     free_data_container(data);
@@ -219,8 +220,10 @@ void* respond(void* response_data) {
         free(post_req); 
     } else {
         strcpy(filename,"data.html");
-        printf("%s\n", filename);
+        
     }
+    
+    printf("configuring response\n");
     
     //read in HTML file
     char* resource = readHTML("index.html");
@@ -235,13 +238,15 @@ void* respond(void* response_data) {
     send(td->fd, td->footer, strlen(td->footer), 0);
     
     // free parsed request 
-    free(pr); 
+//    free(pr); 
 
     if (isPost(pr)) {
         unlink(filename);
     }
-//    
-    close(td->fd);
+    printf("%s\n", filename);
+//    close(td->fd);
+    
+    pthread_exit(NULL);
     return NULL;
 }
 
