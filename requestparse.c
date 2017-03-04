@@ -13,10 +13,13 @@
 #include "sort.h"
 #include <unistd.h>
 
+/*
+ * Parses the incoming request. 
+ */ 
 parsed_request* parse_request(char* request_str) {
     parsed_request* incoming_request = malloc(sizeof(parsed_request));
     
-//    int slen = strlen(request_str);
+    // parse request
     int idx = 0;
     incoming_request->request_type = request_str;
     
@@ -41,10 +44,16 @@ parsed_request* parse_request(char* request_str) {
     return incoming_request;        
 }
 
+/*
+ * Determine if request is a POST response. 
+ */
 int isPost(parsed_request* p) {
     return strcmp(p->request_type, "POST") == 0;
 }
 
+/*
+ * Get the post request. 
+ */
 char* get_post(char* pr){
     char* search = "search";
     char* post = strstr(pr, search);
@@ -52,21 +61,20 @@ char* get_post(char* pr){
     return post; 
 }
 
-
+/*
+ * Parse post request.
+ */
 post_request* parse_post(post_request* pr, char* string){
+    // get post request 
     char* post_string = get_post(string); 
-    // printf("%s\n",post_string);
     char* delim = "&";
     char* tokens[3];
     int index = 0;
-    
-    
+
     // get the key-value pairs
     char* temp = strtok(post_string, delim);
     while(temp != NULL){
-        
         tokens[index] = temp;
-//        printf("keyval %d: %s\n", index, tokens[index]);
         index++;
         temp = strtok(NULL, delim);
     }
@@ -74,30 +82,31 @@ post_request* parse_post(post_request* pr, char* string){
     // set all fields to null
     init_post_request(pr);
     
+    // update post request values 
     char* val;
     for (int i = 0; i < index; i++) {
         val = strtok(tokens[i], "=");
         val = strtok(NULL, "=");
-//        printf("tokens[%d]: %s\n", i, tokens[i]);
-//        printf("val: %s\n", val);
-//        printf("%s: %s \n", tokens[i], val);
         
         if (strcmp(tokens[i], "sortfield") == 0) pr->sort_field = val;
         else if (strcmp(tokens[i], "searchfield") == 0) pr->filter_field = val;
         else if (strcmp(tokens[i], "search") == 0) pr->filter_parameters = val;
     }
-    
     return pr;
 }
 
+/*
+ * Initialize post request.
+ */
 void init_post_request(post_request* pr) {
     pr->filter_parameters = NULL;
     pr->filter_field = NULL;
     pr->sort_field = NULL;
 }
 
-
-
+/*
+ * Create new data set using array list 
+ */
 data_container* array_to_data(void* list, course_data** courses){
     arraylist* course_indices = (arraylist*) list;
     course_data** fc = malloc(sizeof(course_data*)*course_indices->size); 
@@ -117,7 +126,9 @@ data_container* array_to_data(void* list, course_data** courses){
     return data_filtered; 
 }
 
-
+/*
+ * Filter enrollment paraneter. 
+ */
 data_container* filter_enrollment(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -132,6 +143,9 @@ data_container* filter_enrollment(post_request* pr, data_container* data){
     return array_to_data(course_indices, courses); 
 }
 
+/*
+ * Filter instructor paraneter. 
+ */
 data_container* filter_instructor(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -146,12 +160,11 @@ data_container* filter_instructor(post_request* pr, data_container* data){
         }
     }
 
+    // handle case sensitivity
     for (int j = 0; j < strlen(pr->filter_parameters); j++) {
         pr->filter_parameters[j] = toupper(pr->filter_parameters[j]);
     }
-    
-    printf("%s\n", pr->filter_parameters);
-    
+
     // store course indices of matched strings 
     for(int i = 0; i < data->length; i++){
         check = strstr(courses[i]->prof, pr->filter_parameters);
@@ -162,6 +175,9 @@ data_container* filter_instructor(post_request* pr, data_container* data){
     return array_to_data(course_indices, courses);  
 }
 
+/*
+ * Filter the course number parameter.
+ */
 data_container* filter_course_number(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -176,6 +192,9 @@ data_container* filter_course_number(post_request* pr, data_container* data){
     return array_to_data(course_indices, courses);
 }
 
+/*
+ * Filter course_quailty parameter from above a certain value.
+ */ 
 data_container* filter_course_quality(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -190,6 +209,9 @@ data_container* filter_course_quality(post_request* pr, data_container* data){
     return array_to_data(course_indices, courses); 
 }
 
+/*
+ * . Filter course_quality parameter from below a certain value. 
+ */
 data_container* filter_course_quality_low(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -204,6 +226,9 @@ data_container* filter_course_quality_low(post_request* pr, data_container* data
     return array_to_data(course_indices, courses); 
 }
 
+/*
+ * Filter course difficulty from above a certain value.  
+ */
 data_container* filter_course_difficulty(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -218,6 +243,9 @@ data_container* filter_course_difficulty(post_request* pr, data_container* data)
     return array_to_data(course_indices, courses); 
 }
 
+/*
+ * Filter course difficulty from below a certain value.  
+ */
 data_container* filter_course_difficulty_low(post_request* pr, data_container* data){
     course_data** courses = data->data; // courses 
     arraylist* course_indices = al_initialize(2); // array list of course indices 
@@ -232,6 +260,9 @@ data_container* filter_course_difficulty_low(post_request* pr, data_container* d
     return array_to_data(course_indices, courses); 
 }
 
+/*
+ * Choose the appropriate filter based on post request. 
+ */
 data_container* choose_filter(data_container* data, post_request* pr){
     if (pr->filter_field == NULL || pr->filter_parameters == NULL) return data;
     char* field = pr->filter_field; // field for filtering
@@ -260,7 +291,9 @@ data_container* choose_filter(data_container* data, post_request* pr){
     return data;
 }
 
-
+/*
+ * Copy data into new container 
+ */
 data_container* copy_data(data_container* d) {
     data_container* new_container = malloc(sizeof(data_container));
     if (new_container == NULL) return NULL;
@@ -275,6 +308,9 @@ data_container* copy_data(data_container* d) {
     return new_container;
 }
 
+/*
+ * Free shallow data. 
+ */
 void free_shallow_data(data_container* d) {
     // free course data
     free(d->data);
@@ -282,6 +318,9 @@ void free_shallow_data(data_container* d) {
     free(d);
 }
 
+/*
+ * Choose sorting appropriately.
+ */
 void* choose_sort(post_request* pr){
     if (pr->sort_field == NULL) return NULL;
     
@@ -309,12 +348,18 @@ void* choose_sort(post_request* pr){
     return NULL;
 }
 
+/*
+ * Print post request. 
+ */ 
 void print_post_request(post_request* pr){
     printf("sort_field: %s\n", pr->sort_field);
     printf("filter_field: %s\n", pr->filter_field);
     printf("filter_parameters: %s\n\n", pr->filter_parameters);
 }
 
+/*
+ * Print request from the user. 
+ */
 void print_request(parsed_request pr) {
     printf("Request Type: %s\n", pr.request_type);
     printf("Requested resource: %s\n", pr.resource);

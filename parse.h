@@ -12,6 +12,10 @@
 #define parse_h
 
 // declare functions/ structure(s)
+
+/*
+ * Structure that contains course data. 
+ */
 typedef struct CourseData{
 	char* course_info; 
 	char course_id[50];
@@ -22,8 +26,9 @@ typedef struct CourseData{
 	double instructor_quality; 
 } course_data;
 
-
-
+/*
+ * Data container for course data and the number of courses. 
+ */
 typedef struct data {
     course_data** data;
     size_t length;

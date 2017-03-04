@@ -13,7 +13,9 @@
 #include <ctype.h>
 #include "parse.h"
 
-
+/*
+ * Holds struture for a Tree<E>. 
+ */
 typedef struct internetrequest {
     char* request_type;
     char* resource;
@@ -23,15 +25,18 @@ typedef struct internetrequest {
     char* postdata;
 } parsed_request;
 
+/*
+ * Holds structure efor a post request. 
+ */
 typedef struct PostResponse { 
-//	char* filter_parameter;
-//	char* field_type; 
-//	char* field;
     char* filter_parameters;
     char* filter_field;
     char* sort_field;
 } post_request; 
 
+/*
+ * Initialize header functions. 
+ */
 parsed_request* parse_request(char* request_str);
 void print_request(parsed_request pr);
 char* get_variables(char* rest);

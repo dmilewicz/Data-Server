@@ -16,6 +16,9 @@
 #include "parse.h"
 #include "sort.h"
 
+/*
+ * Prints out course data. 
+ */
 void print_courses(course_data** courses, int size){
 	for(int i = 0; i < size; i++){
 		printf("COURSE ID: %s\n",courses[i]->course_id); 
@@ -28,6 +31,10 @@ void print_courses(course_data** courses, int size){
 	}
 }
 
+/*
+ * Returns the total numebr of lines in the file, where each line represents a
+ * course and its respective data. 
+ */
 int total_lines(char* file_name){
 	// open file and initialize variables 
 	FILE* courses_file = fopen(file_name, "rb");
@@ -47,12 +54,16 @@ int total_lines(char* file_name){
 	return num_lines; 
 }
 
-
+/*
+ * Prints courses. 
+ */
 void print_data(data_container* data) {
     print_courses(data->data, data->length);
 }
 
-
+/*
+ * Parses the data from the file 
+ */
 data_container* parse_data(char* filename){
 
     // Initialize files
@@ -84,7 +95,6 @@ data_container* parse_data(char* filename){
     int length = 0;
     int count = 0;
     
-
     // Read in words from text and store into hashtable 
     while(fgets(course_info,150,courses_file)){
         
@@ -100,7 +110,6 @@ data_container* parse_data(char* filename){
 		courses[index]->course_info = malloc(sizeof(char)*length+1);
 		if(courses[index]->course_info == NULL)
 			return NULL;
-//		courses[index].course_info[length] = '\0';
 
 		// copy string contents from line to data structure 
 		strcpy(courses[index]->course_info, course_info); 
@@ -110,60 +119,48 @@ data_container* parse_data(char* filename){
 			if(count == 0){
 				temp = strtok(course_info, ",");  
 				strcpy(courses[index]->course_id, temp);
-				// temp = strcat(open_data_tag, courses[index].course_id); 
-				// temp = strcat(temp, closed_data_tag); 
-				// fputs(temp, data_file);
 			}
 
 			if(count == 1){
 				temp = strtok(NULL, ","); 
 				temp++; 
 				strcpy(courses[index]->prof, temp); 
-				// printf("%s\n", courses[index].prof);
 			}
 
 			if(count == 2){
 				temp = strtok(NULL, ","); 
 				temp++; 
-				courses[index]->enrollment = atoi(temp);
-				// printf("%d\n", courses[index].enrollment);	
+				courses[index]->enrollment = atoi(temp);	
 			}
 
 			if(count == 3){
 				temp = strtok(NULL, ","); 
 				temp++;
-				courses[index]->quality = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].quality);	
+				courses[index]->quality = strtod(temp, NULL); 	
 			}
 
 			if(count == 4){
 				temp = strtok(NULL, ","); 
 				temp++; 
 				courses[index]->difficulty = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].difficulty);
 			}
 
 			if(count == 5){
 				temp = strtok(NULL, "\n"); 
 				temp++; 
-				courses[index]->instructor_quality = strtod(temp, NULL); 
-				// printf("%f\n", courses[index].instructor_quality);	
+				courses[index]->instructor_quality = strtod(temp, NULL); 	
 			}
 			count++; 
 		}
-		// printf("%s\n", courses[index].course_info);
-        
+		
         // reset & update helper variables
 		memset(course_info, '\0',150);
 		index++;
 		count = 0;
     }
-    // printf("\n");
-//    print_courses(courses,num_lines);
     
     // create container for the data;
     data_container* course_data = malloc(sizeof(data_container));
-    
     course_data->data = courses;
     course_data->length = index;
     
@@ -173,7 +170,9 @@ data_container* parse_data(char* filename){
     
 }
 
-
+/*
+ * Compute and write averages of courses info to an html file.
+ */ 
 void write_averages(data_container* my_data, FILE* data_file) {
     // store header 
     char* header = "<table border='1'>\n<tr>\n<th>Total Courses</th>\n<th>Avg. Enrollment</th>\n<th>Avg. Course Quality</th>\n<th>Avg. Course Difficulty</th>\n<th>Avg. Instructor Quality</th>\n";
@@ -188,6 +187,7 @@ void write_averages(data_container* my_data, FILE* data_file) {
     char* open_data_tag = "<td> ";
     char* closed_data_tag = "</td>\n";
 
+    // account for having no course data 
     if(my_data->length > 0){
       int avg_enrollment = average_enrollment(my_data);
       double avg_quality = average_quality(my_data);
@@ -232,15 +232,18 @@ void write_averages(data_container* my_data, FILE* data_file) {
     fputs(footer, data_file);
 }
 
+/*
+ * Write data to html file.
+ */
 void data_to_HTML(data_container* data , char* data_target) {
-    
+    // initialize FILE pointer 
     FILE* data_file = fopen(data_target,"w");
 
+    // write averages to respective file
     write_averages(data, data_file);
      
     // write header to data.html file
     char* header = "<table border='1'>\n<tr>\n<th>Course Number</th>\n<th>Instructor</th>\n<th>Enrollment</th>\n<th>Course Quality</th>\n<th>Course Difficulty</th>\n<th>Instructor Quality</th>\n";
-    
     fputs(header, data_file);
 
     // initialize open and close row/data tags
@@ -251,6 +254,7 @@ void data_to_HTML(data_container* data , char* data_target) {
         
     char buf[15];
     
+    // write data to file 
     for ( int i = 0; i < data->length; i++) {
         // start new row of data
         fputs(open_row_tag, data_file);
@@ -296,6 +300,9 @@ void data_to_HTML(data_container* data , char* data_target) {
     
 }
 
+/*
+ * Frees data from data container. 
+ */
 void free_data_container(data_container* d) {
     // free data
     for ( int i = 0; i < d->length; i++) {
@@ -309,6 +316,9 @@ void free_data_container(data_container* d) {
     return;
 }
 
+/*
+ * Frees shallow data.
+ */ 
 void free_data_shallow(data_container* d) {
     free(d->data);
     free(d);
