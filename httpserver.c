@@ -158,6 +158,9 @@ int start_server(int PORT_NUMBER)
     
     // free the data container
     free_data_container(data);
+    
+    // free the lock
+    free(lock);
 
     // 8. close: close the socket
     close(sock);
