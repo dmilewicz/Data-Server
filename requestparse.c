@@ -262,6 +262,7 @@ data_container* copy_data(data_container* d) {
     if (new_container == NULL) return NULL;
     
     new_container->data = malloc(sizeof(course_data*) * d->length);
+    if (new_container->data == NULL) return NULL;
     
     for (int i = 0; i < d->length; i++) {
         new_container->data[i] = d->data[i];
@@ -271,12 +272,12 @@ data_container* copy_data(data_container* d) {
     return new_container;
 }
 
-void free_shallow_data(data_container* d) {
-    // free course data
-//    free(d->data);
-    // free container
-    free(d);
-}
+//void free_shallow_data(data_container* d) {
+//    // free course data
+////    free(d->data);
+//    // free container
+//    free(d);
+//}
 
 void* choose_sort(post_request* pr){
     if (pr->sort_field == NULL) return NULL;

@@ -24,13 +24,17 @@ void* respond(void* response_data);
 int end = 0; // signal to stop the server
 
 void* stop(void* arg){
-    char* input = malloc(sizeof(char)*10); 
+    char* input = malloc(sizeof(char)*10);
+    pthread_mutex_t* lock = (pthread_mutex_t*) arg;
     while(end != 1){
         printf("Enter 'q' to stop program: "); 
         scanf("%s", input); 
         // printf("%s\n", input);
-        if(strcmp("q",input) == 0)
-            end = 1;  
+        if(strcmp("q",input) == 0) {
+            pthread_mutex_lock(lock);
+            end = 1;
+            pthread_mutex_unlock(lock);
+        }
     }
     free(input);
     pthread_exit(NULL); 
@@ -84,12 +88,26 @@ int start_server(int PORT_NUMBER)
     
     unsigned int request_count = 0;
     size_t num_threads = 100;
+    void* r = NULL;
     
     pthread_t threads[num_threads];
     
+
+    pthread_mutex_t* lock = malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(lock,NULL);
+
+        // create stop thread
+    pthread_t t;
+    pthread_create(&t, NULL, &stop, lock);
+    
     data_to_HTML(data, "data.html");
     
+    
+    
+    
+    pthread_mutex_lock(lock);
     while(end != 1) {
+        pthread_mutex_unlock(lock);
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
         if (listen(sock, 10) == -1) {
@@ -116,7 +134,7 @@ int start_server(int PORT_NUMBER)
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-            if (request_count > num_threads) pthread_join(threads[request_count % num_threads], NULL);
+            if (request_count > num_threads) pthread_join(threads[request_count % num_threads], r);
             
             printf("creating thread\n");
             pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
@@ -125,11 +143,18 @@ int start_server(int PORT_NUMBER)
 //            sleep(1);
 //            close(fd);
         }
-        // 7. close: close the connection
-        printf("Server closed connection\n"); 
+        
+        pthread_mutex_lock(lock);
     }
-    // join
-    for (int i = 0; i < (request_count % num_threads) ; i++) pthread_join(threads[i], NULL);
+    //unlock mutex
+    pthread_mutex_unlock(lock);
+    
+    // join end thread
+    pthread_join(t, NULL);
+    
+    // join response threads
+    for (int i = 0; i < (request_count % num_threads) ; i++)
+        pthread_join(threads[i], r);
     
     // free the data container
     free_data_container(data);
@@ -156,12 +181,9 @@ int main(int argc, char *argv[])
         printf("\nPlease specify a port number greater than 1024\n");
         exit(-1);
     }
-    // create stop thread
-    pthread_t t;
-    pthread_create(&t, NULL, &stop, NULL);
+
     // start server
     start_server(port_number);
-    pthread_join(t, NULL);
     
     return 0; 
 }
@@ -216,8 +238,7 @@ void* respond(void* response_data) {
         data_to_HTML(pd, filename);  
 
         // free temporary post data container 
-        free_shallow_data(pd);
-//        free(pd);
+        free(pd);
         
         // free post request 
         free(post_req); 
@@ -233,11 +254,14 @@ void* respond(void* response_data) {
     // parse data into structure and format data into html
     char* data = readHTML(filename);
     
+    char* header = td->header;
+    char* footer = td->footer;
+    
     // 6. send: send the outgoing message (response) over the socket
-    send(td->fd, td->header, strlen(td->header), 0);
+    send(td->fd, header, strlen(header), 0);
     send(td->fd, resource, strlen(resource), 0);
     send(td->fd, data, strlen(data), 0);
-    send(td->fd, td->footer, strlen(td->footer), 0);
+    send(td->fd, footer, strlen(footer), 0);
     
 
     if (isPost(pr)) {
@@ -248,14 +272,20 @@ void* respond(void* response_data) {
     free(data);
     free(resource);
     
+    // free request
     free(pr);
-    printf("%s\n", filename);
+    
+    // 7. close: close the connection
+    printf("Server closed connection\n");
     close(td->fd);
     
-    free_data_shallow(td->data);
+    // free data
+//    free_data_shallow(td->data);
+    free(td->data->data);
+    free(td->data);
     free(td);
+    
     pthread_exit(NULL);
-    return NULL;
 }
 
 
