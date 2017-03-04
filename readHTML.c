@@ -5,12 +5,13 @@
 //  Created by David Milewicz on 2/14/17.
 //  Copyright © 2017 David Milewicz. All rights reserved.
 //
-
 #include "readHTML.h"
 
-
-
+/*
+ * Read html file. 
+ */ 
 char* readHTML(char* resource) {
+    // open file 
     FILE* fp= fopen(resource, "rb");
     if (fp == NULL) return NULL;
     
@@ -25,5 +26,4 @@ char* readHTML(char* resource) {
     fclose(fp);
     
     return file_contents;
-
 }

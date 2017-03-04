@@ -4,7 +4,6 @@ http://www.prasannatech.net/2008/07/socket-programming-tutorial.html
 and
 http://www.binarii.com/files/papers/c_sockets.txt
  */
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -143,12 +142,11 @@ int start_server(int PORT_NUMBER)
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-            // pthread_join(threads[request_count % num_threads], NULL);
-            
-            // create new thread
+            // wait for thread to return if request count exceeds number of threads
             printf("creating thread");
             if (request_count > num_threads) pthread_join(threads[request_count % num_threads], r);
             
+            // create new thread
             printf("creating thread\n");
             pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
             
@@ -176,7 +174,6 @@ int start_server(int PORT_NUMBER)
     close(sock);
     printf("Server shutting down\n");
     unlink("data.html");
-  
     return 0;
 } 
 
@@ -235,7 +232,7 @@ void* respond(void* response_data) {
         // check to see if data should be filtered
         pd = choose_filter(td->data, post_req);
         
-        // check to see if data shoudl be sorted 
+        // check to see if data should be sorted 
         comparep = choose_sort(post_req);
         if (comparep != NULL) {
 //            sleep(30);
@@ -243,14 +240,14 @@ void* respond(void* response_data) {
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
 
-        // store data from response to post request into html file 
         sprintf(filename, "data%d.html", td->fd);
 
-        data_to_HTML(pd, filename);        
-        if (pd != td->data) {
+        data_to_HTML(pd, filename);  
+
+        // if(pd != td->data){
             free_data_shallow(pd);
             printf("FREEING MEMORY\n");
-        }
+         // }      
         // free post request 
         free(post_req); 
     } 
@@ -266,6 +263,8 @@ void* respond(void* response_data) {
 
     // parse data into structure and format data into html
     char* data = readHTML(filename);
+
+    printf("%s",data);
     
     char* header = td->header;
     char* footer = td->footer;
@@ -276,7 +275,7 @@ void* respond(void* response_data) {
     send(td->fd, data, strlen(data), 0);
     send(td->fd, footer, strlen(footer), 0);
     
-
+    // check to see if post request
     if (isPost(pr)) {
         unlink(filename);
     }

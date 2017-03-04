@@ -6,12 +6,6 @@
 //  Copyright © 2017 David Milewicz. All rights reserved.
 //
 
-#include "sort.h"
-#include <string.h>
-
-
-
-
 /*
  ********************************************
  *
@@ -19,13 +13,18 @@
  *
  ********************************************
  */
+#include "sort.h"
+#include <string.h>
 
-
-
+/*
+ * Sort data using quicksort algorithm.
+ */
 void quicksort_data(course_data** data, int p, int r, int (*compare)(course_data*, course_data*) ) {
     if (p >= r) return;
-    
+    // partition data 
     int q = partition_data(data, p, r, compare);
+    
+    // sort the data based on partition  
     quicksort_data(data, p, q-1, compare);
     quicksort_data(data, q+1, r, compare);
     
@@ -42,23 +41,21 @@ int partition_data(course_data** data, int p, int r, int (*compare)(course_data*
     
     while( i <= j) {
 
-        
         while(i <= j && compare(data[i], pivot) <= 0) {
             i++;
-
-
         }
+
         while(i <= j && compare(data[j], pivot) > 0) j--;
         
         if (i <= j) swap(data, i, j);
     }
     swap(data, p, j);
-    
-    return j;
-    
+    return j; 
 }
 
-
+/*
+ * Swap
+ */
 void swap(course_data** arr, int a, int b) {
     course_data* temp = arr[a];
     arr[a] = arr[b];
@@ -74,34 +71,58 @@ void swap(course_data** arr, int a, int b) {
  ********************************************
  */
 
+/*
+ * Sort by course id. 
+ */ 
 int compare_course_id(course_data* a, course_data* b) {
     return strcmp(a->course_id, b->course_id);
 }
 
+/*
+ * Sort by professors. 
+ */ 
 int compare_professors(course_data* a, course_data* b) {
     return strcmp(a->prof, b->prof);
 }
 
+/*
+ * Sort by enrollment. 
+ */ 
 int compare_enrollment(course_data* a, course_data* b) {
     return a->enrollment - b->enrollment;
 }
 
+/*
+ * Sort by course quality from low to high. 
+ */ 
 int compare_quality_low(course_data* a, course_data* b) {
     return ((100 * a->quality)) - ((100 * b->quality));
 }
 
+/*
+ * Sort by course difficulty from high to low.  
+ */ 
 int compare_difficulty_high(course_data* a, course_data* b) {
     return  (b->difficulty * 100) - (a->difficulty * 100);
 }
 
+/*
+ * Sort by instructor quality from  
+ */ 
 int compare_instructor_quality(course_data* a, course_data* b) {
     return (a->instructor_quality * 100) - (100 * b->instructor_quality);
 }
 
+/*
+ * Sort by course quality from high to low. 
+ */ 
 int compare_quality_high(course_data* a, course_data* b) {
     return ((100 * b->quality)) - ((100 * a->quality));
 }
 
+/*
+ * Sort by course difficulty low to high. 
+ */
 int compare_difficulty_low(course_data* a, course_data* b) {
     return (100 * b->difficulty) - (100 * a->difficulty);
 }

@@ -210,17 +210,17 @@ void write_averages(data_container* my_data, FILE* data_file) {
         fputs(closed_data_tag, data_file);
         
         fputs(open_data_tag, data_file);
-        sprintf(buf, "%f", avg_quality);
+        sprintf(buf, "%.2f", avg_quality);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file);
         
         fputs(open_data_tag, data_file);
-        sprintf(buf, "%f", avg_difficulty);
+        sprintf(buf, "%.2f", avg_difficulty);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file);
         
         fputs(open_data_tag, data_file);
-        sprintf(buf, "%f", avg_prof_quality);
+        sprintf(buf, "%.2f", avg_prof_quality);
         fputs(buf, data_file);
         fputs(closed_data_tag, data_file); 
 
@@ -292,12 +292,11 @@ void data_to_HTML(data_container* data , char* data_target) {
         
     }
     // add footer to data.html file
-    char* footer = "</table>";
+    char* footer = "</table>\n";
     fputs(footer, data_file);
     
     // close the file
-    fclose(data_file);
-    
+    fclose(data_file);   
 }
 
 /*
