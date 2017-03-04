@@ -302,18 +302,12 @@ void free_data_container(data_container* d) {
         free(d->data[i]->course_info);
         free(d->data[i]);
     }
-    
     free(d->data);
-    
     // free container
     free(d);
-    
     // success
     return;
 }
-
-
-
 
 void free_data_shallow(data_container* d) {
     free(d->data);

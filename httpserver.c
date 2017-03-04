@@ -23,12 +23,14 @@ http://www.binarii.com/files/papers/c_sockets.txt
 void* respond(void* response_data);
 int end = 0; // signal to stop the server
 
+/*
+ * Stops thread after 'q' has been entered. (Will gracefully exit program after one request.)
+ */
 void* stop(void* arg){
-    char* input = malloc(sizeof(char)*10); 
+    char* input = malloc(sizeof(char)*10); // user input 
     while(end != 1){
         printf("Enter 'q' to stop program: "); 
         scanf("%s", input); 
-        // printf("%s\n", input);
         if(strcmp("q",input) == 0)
             end = 1;  
     }
@@ -36,7 +38,9 @@ void* stop(void* arg){
     pthread_exit(NULL); 
 }
 
-
+/*
+ * Structure for holding thread data.
+ */ 
 typedef struct threaddata {
     char* header;
     char* footer;
@@ -44,7 +48,9 @@ typedef struct threaddata {
     data_container* data;
 } thread_data;
 
-
+/*
+ * Start server connection. 
+ */ 
 int start_server(int PORT_NUMBER)
 {
 
@@ -76,19 +82,23 @@ int start_server(int PORT_NUMBER)
         exit(1);
     }
     
+    // create data container 
     unlink("data.html");
     data_container* data = parse_data("course_evals.txt");
     
+    // set header and footer of response 
     char* header = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
     char* footer = "</body></html>";
     
+    // initialize thread array 
     unsigned int request_count = 0;
     size_t num_threads = 100;
-    
     pthread_t threads[num_threads];
     
+    // write all of the course data to an html file
     data_to_HTML(data, "data.html");
     
+    // will exit the loop after 'q' is entered in the terminal (exits the program, when end = 1)
     while(end != 1) {
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
@@ -110,14 +120,16 @@ int start_server(int PORT_NUMBER)
             printf("fd: %d\n", fd);
             printf("sock: %d\n\n", sock);
             
+            // create thread data 
             thread_data* pass_data = malloc(sizeof(thread_data));
             pass_data->header = header;
             pass_data->footer = footer;
             pass_data->fd = fd;
             pass_data->data = copy_data(data);
             
-           // pthread_join(threads[request_count % num_threads], NULL);
+            // pthread_join(threads[request_count % num_threads], NULL);
             
+            // create new thread
             printf("creating thread");
             pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
         
@@ -140,7 +152,9 @@ int start_server(int PORT_NUMBER)
     return 0;
 } 
 
-
+/*
+ * Run main program here. 
+ */
 int main(int argc, char *argv[])
 {
   // check the number of arguments
@@ -149,6 +163,7 @@ int main(int argc, char *argv[])
       exit(-1);
   }
 
+  // store port number and check for validity 
   int port_number = atoi(argv[1]);
   if (port_number <= 1024) {
     printf("\nPlease specify a port number greater than 1024\n");
@@ -164,6 +179,9 @@ int main(int argc, char *argv[])
   return 0; 
 }
 
+/*
+ * Method handles a response to a request.
+ */ 
 void* respond(void* response_data) {
     thread_data* td = (thread_data*)response_data;
 
@@ -176,48 +194,45 @@ void* respond(void* response_data) {
     // null-terminate the string
     request[bytes_received] = '\0';
 
+    // parse request from user
     parsed_request* pr = parse_request(request);
     print_request(*pr);
     
     data_container* pd;
     char filename[100];
     
+    // if it is a post request, enter the code block successeding the conditional 
     if (  isPost(pr)  ) {
         post_request* post_req = malloc(sizeof(post_request));
         if(post_req == NULL) return NULL;
         
+        // parse the post request 
         parse_post(post_req, pr->rest);
         int (*comparep) (course_data*, course_data*) = compare_course_id;
         
-        // print_post_request(post_req);
-         
-        // printf("Choosing filter...");
+        // check to see if data should be filtered
         pd = choose_filter(td->data, post_req);
-        // printf("done.\n");
-    
-        // printf("pd length: %zu\n", pd->length);
         
-        // printf("Choosing sort...");
+        // check to see if data shoudl be sorted 
         comparep = choose_sort(post_req);
-        // printf("done.\n");
-        
-        // printf("Evaluating sort...");
         if (comparep != NULL) {
             sleep(30);
             printf("sort request detected: sorting...");
-            // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
-        // printf("done.\n");
-        
+
+        // store data from response to post request into html file 
         sprintf(filename, "data%d.html", td->fd);
         data_to_HTML(pd, filename);  
 
         // free temporary post data container 
         free_shallow_data(pd);
+        
         // free post request 
         free(post_req); 
-    } else {
+    } 
+    else {
+        // copy file name 
         strcpy(filename,"data.html");
         printf("%s\n", filename);
     }
@@ -240,7 +255,8 @@ void* respond(void* response_data) {
     if (isPost(pr)) {
         unlink(filename);
     }
-//    
+
+    // close connection
     close(td->fd);
     return NULL;
 }
