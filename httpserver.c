@@ -145,25 +145,25 @@ int start_server(int PORT_NUMBER)
 
 int main(int argc, char *argv[])
 {
-  // check the number of arguments
-  if (argc != 2) {
-      printf("\nUsage: %s [port_number]\n", argv[0]);
-      exit(-1);
-  }
-
-  int port_number = atoi(argv[1]);
-  if (port_number <= 1024) {
-    printf("\nPlease specify a port number greater than 1024\n");
-    exit(-1);
-  }
-  // create stop thread 
-  pthread_t t;
-  pthread_create(&t, NULL, &stop, NULL); 
-  // start server 
-  start_server(port_number);
-  pthread_join(t, NULL);
-
-  return 0; 
+    // check the number of arguments
+    if (argc != 2) {
+        printf("\nUsage: %s [port_number]\n", argv[0]);
+        exit(-1);
+    }
+    
+    int port_number = atoi(argv[1]);
+    if (port_number <= 1024) {
+        printf("\nPlease specify a port number greater than 1024\n");
+        exit(-1);
+    }
+    // create stop thread
+    pthread_t t;
+    pthread_create(&t, NULL, &stop, NULL);
+    // start server
+    start_server(port_number);
+    pthread_join(t, NULL);
+    
+    return 0; 
 }
 
 void* respond(void* response_data) {
@@ -217,11 +217,12 @@ void* respond(void* response_data) {
 
         // free temporary post data container 
         free_shallow_data(pd);
+//        free(pd);
+        
         // free post request 
         free(post_req); 
     } else {
         strcpy(filename,"data.html");
-        
     }
     
     printf("configuring response\n");
@@ -243,10 +244,16 @@ void* respond(void* response_data) {
         unlink(filename);
     }
     
+    // free html from memory
+    free(data);
+    free(resource);
+    
     free(pr);
     printf("%s\n", filename);
     close(td->fd);
     
+    free_data_shallow(td->data);
+    free(td);
     pthread_exit(NULL);
     return NULL;
 }

@@ -273,8 +273,8 @@ data_container* copy_data(data_container* d) {
 
 void free_shallow_data(data_container* d) {
     // free course data
-    free(d->data);
-    // free container 
+//    free(d->data);
+    // free container
     free(d);
 }
 
