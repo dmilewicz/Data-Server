@@ -310,6 +310,7 @@ data_container* copy_data(data_container* d) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*
  * Free shallow data. 
  */
@@ -327,6 +328,14 @@ void free_shallow_data(data_container* d) {
 //    free(d);
 //}
 >>>>>>> 7344c031fefb9b4b8aaa1835347291d8d4c91378
+=======
+void free_shallow_data(data_container* d) {
+    // free course data
+//    free(d->data);
+    // free container
+    free(d);
+}
+>>>>>>> 13048b5f4461fd288ccfde05de8e4c4b8ef1e70b
 
 /*
  * Choose sorting appropriately.
