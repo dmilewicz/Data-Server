@@ -27,12 +27,17 @@ int end = 0; // signal to stop the server
  * Stops thread after 'q' has been entered. (Will gracefully exit program after one request.)
  */
 void* stop(void* arg){
-    char* input = malloc(sizeof(char)*10); // user input 
+    char* input = malloc(sizeof(char)*10);
+    pthread_mutex_t* lock = (pthread_mutex_t*) arg;
     while(end != 1){
         printf("Enter 'q' to stop program: "); 
         scanf("%s", input); 
-        if(strcmp("q",input) == 0)
-            end = 1;  
+        // printf("%s\n", input);
+        if(strcmp("q",input) == 0) {
+            pthread_mutex_lock(lock);
+            end = 1;
+            pthread_mutex_unlock(lock);
+        }
     }
     free(input);
     pthread_exit(NULL); 
@@ -93,13 +98,24 @@ int start_server(int PORT_NUMBER)
     // initialize thread array 
     unsigned int request_count = 0;
     size_t num_threads = 100;
+    void* r = NULL;
     pthread_t threads[num_threads];
     
-    // write all of the course data to an html file
+
+    pthread_mutex_t* lock = malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(lock,NULL);
+
+    // create stop thread
+    pthread_t t;
+    pthread_create(&t, NULL, &stop, lock);
+    
     data_to_HTML(data, "data.html");
     
+    pthread_mutex_lock(lock);
+
     // will exit the loop after 'q' is entered in the terminal (exits the program, when end = 1)
     while(end != 1) {
+        pthread_mutex_unlock(lock);
         // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
         // second arg here is the number of possible queued connections
         if (listen(sock, 10) == -1) {
@@ -131,23 +147,35 @@ int start_server(int PORT_NUMBER)
             
             // create new thread
             printf("creating thread");
-            pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
-        
-            request_count++;
+            if (request_count > num_threads) pthread_join(threads[request_count % num_threads], r);
             
+            printf("creating thread\n");
+            pthread_create(&threads[request_count % num_threads], NULL, respond, pass_data);
+            
+            request_count++;
         }
-        // 7. close: close the connection
-        printf("Server closed connection\n"); 
+        pthread_mutex_lock(lock);
     }
-    // join
-    //for (int i = 0; i < num_threads; i++) pthread_join(threads[i], NULL);
+    //unlock mutex
+    pthread_mutex_unlock(lock);
+    
+    // join end thread
+    pthread_join(t, NULL);
+    
+    // join response threads
+    for (int i = 0; i < (request_count % num_threads) ; i++)
+        pthread_join(threads[i], r);
     
     // free the data container
     free_data_container(data);
+    
+    // free the lock
+    free(lock);
 
     // 8. close: close the socket
     close(sock);
     printf("Server shutting down\n");
+    unlink("data.html");
   
     return 0;
 } 
@@ -157,26 +185,20 @@ int start_server(int PORT_NUMBER)
  */
 int main(int argc, char *argv[])
 {
-  // check the number of arguments
-  if (argc != 2) {
-      printf("\nUsage: %s [port_number]\n", argv[0]);
-      exit(-1);
-  }
-
-  // store port number and check for validity 
-  int port_number = atoi(argv[1]);
-  if (port_number <= 1024) {
-    printf("\nPlease specify a port number greater than 1024\n");
-    exit(-1);
-  }
-  // create stop thread 
-  pthread_t t;
-  pthread_create(&t, NULL, &stop, NULL); 
-  // start server 
-  start_server(port_number);
-  pthread_join(t, NULL);
-
-  return 0; 
+    // check the number of arguments
+    if (argc != 2) {
+        printf("\nUsage: %s [port_number]\n", argv[0]);
+        exit(-1);
+    }
+    
+    int port_number = atoi(argv[1]);
+    if (port_number <= 1024) {
+        printf("\nPlease specify a port number greater than 1024\n");
+        exit(-1);
+    }
+    // start server
+    start_server(port_number);
+    return 0; 
 }
 
 /*
@@ -216,7 +238,7 @@ void* respond(void* response_data) {
         // check to see if data shoudl be sorted 
         comparep = choose_sort(post_req);
         if (comparep != NULL) {
-            sleep(30);
+//            sleep(30);
             printf("sort request detected: sorting...");
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
@@ -226,16 +248,16 @@ void* respond(void* response_data) {
         data_to_HTML(pd, filename);  
 
         // free temporary post data container 
-        free_shallow_data(pd);
-        
+        free(pd);        
         // free post request 
         free(post_req); 
     } 
     else {
         // copy file name 
         strcpy(filename,"data.html");
-        printf("%s\n", filename);
     }
+    
+    printf("configuring response\n");
     
     //read in HTML file
     char* resource = readHTML("index.html");
@@ -243,56 +265,38 @@ void* respond(void* response_data) {
     // parse data into structure and format data into html
     char* data = readHTML(filename);
     
+    char* header = td->header;
+    char* footer = td->footer;
+    
     // 6. send: send the outgoing message (response) over the socket
-    send(td->fd, td->header, strlen(td->header), 0);
+    send(td->fd, header, strlen(header), 0);
     send(td->fd, resource, strlen(resource), 0);
     send(td->fd, data, strlen(data), 0);
-    send(td->fd, td->footer, strlen(td->footer), 0);
+    send(td->fd, footer, strlen(footer), 0);
     
-    // free parsed request 
-    free(pr); 
 
     if (isPost(pr)) {
         unlink(filename);
     }
-
-    // close connection
+    
+    // free html from memory
+    free(data);
+    free(resource);
+    
+    // free request
+    free(pr);
+    
+    // 7. close: close the connection
+    printf("Server closed connection\n");
     close(td->fd);
-    return NULL;
+    
+    // free data
+    free(td->data->data);
+    free(td->data);
+    free(td);
+    
+    pthread_exit(NULL);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
