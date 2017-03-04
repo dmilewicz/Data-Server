@@ -272,12 +272,12 @@ data_container* copy_data(data_container* d) {
     return new_container;
 }
 
-//void free_shallow_data(data_container* d) {
-//    // free course data
-////    free(d->data);
-//    // free container
-//    free(d);
-//}
+void free_shallow_data(data_container* d) {
+    // free course data
+//    free(d->data);
+    // free container
+    free(d);
+}
 
 void* choose_sort(post_request* pr){
     if (pr->sort_field == NULL) return NULL;

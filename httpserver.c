@@ -232,16 +232,17 @@ void* respond(void* response_data) {
         if (comparep != NULL) {
 //            sleep(30);
             printf("sort request detected: sorting...");
-            // sleep(40);
             quicksort_data(pd->data, 0, pd->length - 1, comparep);
         }
         // printf("done.\n");
         
         sprintf(filename, "data%d.html", td->fd);
-        data_to_HTML(pd, filename);  
-
-        // free temporary post data container 
-        free(pd);
+        data_to_HTML(pd, filename);
+        
+        if (pd != td->data) {
+            free_data_shallow(pd);
+            printf("FREEING MEMORY\n");
+        }
         
         // free post request 
         free(post_req); 
@@ -283,9 +284,7 @@ void* respond(void* response_data) {
     close(td->fd);
     
     // free data
-//    free_data_shallow(td->data);
-    free(td->data->data);
-    free(td->data);
+    free_data_shallow(td->data);
     free(td);
     
     pthread_exit(NULL);
